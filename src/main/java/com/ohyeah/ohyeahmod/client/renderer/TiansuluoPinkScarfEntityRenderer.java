@@ -4,13 +4,17 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.ohyeah.ohyeahmod.OhYeah;
 import com.ohyeah.ohyeahmod.client.model.TiansuluoPinkScarfEntityModel;
-import com.ohyeah.ohyeahmod.entity.TiansuluoPinkScarfEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.TiansuluoPinkScarfEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
+/** 粉围巾模型的原生 MobRenderer 缩放/朝向实现。 */
 public class TiansuluoPinkScarfEntityRenderer extends MobRenderer<TiansuluoPinkScarfEntity, TiansuluoPinkScarfEntityModel> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(OhYeah.MODID, "textures/entity/tiansuluo_pink_scarf.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(
+            OhYeah.MODID,
+            "textures/entity/tiansuluo_pink_scarf.png"
+    );
 
     public TiansuluoPinkScarfEntityRenderer(EntityRendererProvider.Context context) {
         super(context, new TiansuluoPinkScarfEntityModel(context.bakeLayer(TiansuluoPinkScarfEntityModel.LAYER_LOCATION)), 0.7F);
@@ -22,13 +26,11 @@ public class TiansuluoPinkScarfEntityRenderer extends MobRenderer<TiansuluoPinkS
     }
 
     @Override
-    protected void setupRotations(TiansuluoPinkScarfEntity entity, PoseStack poseStack, float bob, float yBodyRot, float partialTick, float scale) {
-        super.setupRotations(entity, poseStack, bob, yBodyRot, partialTick, scale);
-        poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
-        float renderScale = 0.61F;
+    protected void scale(TiansuluoPinkScarfEntity entity, PoseStack poseStack, float partialTick) {
+        super.scale(entity, poseStack, partialTick);
+        poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
         if (entity.isBaby()) {
-            renderScale *= 0.55F;
+            poseStack.scale(0.55F, 0.55F, 0.55F);
         }
-        poseStack.scale(renderScale, renderScale, renderScale);
     }
 }

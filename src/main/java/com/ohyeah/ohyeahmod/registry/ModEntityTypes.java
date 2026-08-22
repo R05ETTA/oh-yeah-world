@@ -1,10 +1,13 @@
 package com.ohyeah.ohyeahmod.registry;
 
 import com.ohyeah.ohyeahmod.OhYeah;
-import com.ohyeah.ohyeahmod.entity.SuxiaEntity;
-import com.ohyeah.ohyeahmod.entity.TiansuluoBattleFaceEntity;
-import com.ohyeah.ohyeahmod.entity.TiansuluoPinkScarfEntity;
-import com.ohyeah.ohyeahmod.entity.projectile.TiansuluoPinkScarfProjectileEntity;
+import com.ohyeah.ohyeahmod.entity.suxia.SuxiaEntity;
+import com.ohyeah.ohyeahmod.entity.suxia.SuxiaProfile;
+import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.BattleFaceProfile;
+import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.TiansuluoBattleFaceEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProjectileEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.TiansuluoPinkScarfEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -22,13 +25,13 @@ public final class ModEntityTypes {
     public static final DeferredHolder<EntityType<?>, EntityType<TiansuluoPinkScarfEntity>> TIANSULUO_PINK_SCARF = ENTITY_TYPES.register(
             "tiansuluo_pink_scarf",
             () -> EntityType.Builder.of(TiansuluoPinkScarfEntity::new, MobCategory.CREATURE)
-                    .sized(TiansuluoPinkScarfEntity.WIDTH, TiansuluoPinkScarfEntity.HEIGHT)
+                    .sized(PinkScarfProfile.WIDTH, PinkScarfProfile.HEIGHT)
                     .clientTrackingRange(8)
                     .build("tiansuluo_pink_scarf")
     );
-    public static final DeferredHolder<EntityType<?>, EntityType<TiansuluoPinkScarfProjectileEntity>> TIANSULUO_PINK_SCARF_PROJECTILE = ENTITY_TYPES.register(
+    public static final DeferredHolder<EntityType<?>, EntityType<PinkScarfProjectileEntity>> TIANSULUO_PINK_SCARF_PROJECTILE = ENTITY_TYPES.register(
             "tiansuluo_pink_scarf_projectile",
-            () -> EntityType.Builder.<TiansuluoPinkScarfProjectileEntity>of(TiansuluoPinkScarfProjectileEntity::new, MobCategory.MISC)
+            () -> EntityType.Builder.<PinkScarfProjectileEntity>of(PinkScarfProjectileEntity::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)
                     .clientTrackingRange(4)
                     .updateInterval(10)
@@ -37,14 +40,14 @@ public final class ModEntityTypes {
     public static final DeferredHolder<EntityType<?>, EntityType<TiansuluoBattleFaceEntity>> TIANSULUO_BATTLE_FACE = ENTITY_TYPES.register(
             "tiansuluo_battle_face",
             () -> EntityType.Builder.of(TiansuluoBattleFaceEntity::new, MobCategory.CREATURE)
-                    .sized(TiansuluoBattleFaceEntity.TARGET_ADULT_WIDTH, TiansuluoBattleFaceEntity.TARGET_ADULT_HEIGHT)
+                    .sized(BattleFaceProfile.TARGET_ADULT_WIDTH, BattleFaceProfile.TARGET_ADULT_HEIGHT)
                     .clientTrackingRange(8)
                     .build("tiansuluo_battle_face")
     );
     public static final DeferredHolder<EntityType<?>, EntityType<SuxiaEntity>> SUXIA = ENTITY_TYPES.register(
             "suxia",
             () -> EntityType.Builder.of(SuxiaEntity::new, MobCategory.WATER_CREATURE)
-                    .sized(0.4F, 0.8F)
+                    .sized(SuxiaProfile.WIDTH, SuxiaProfile.HEIGHT)
                     .eyeHeight(0.4F)
                     .clientTrackingRange(8)
                     .build("suxia")

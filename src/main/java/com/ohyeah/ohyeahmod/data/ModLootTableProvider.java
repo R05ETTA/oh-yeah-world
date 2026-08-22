@@ -11,7 +11,6 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -43,8 +42,8 @@ public final class ModLootTableProvider {
 
         @Override
         protected void generate() {
-            dropSelf(ModBlocks.TIANSULUO_PINK_SCARF_LUANLUAN_BLOCK.get());
-            dropSelf(ModBlocks.TIANSULUO_BATTLE_FACE_LUANLUAN_BLOCK.get());
+            add(ModBlocks.TIANSULUO_PINK_SCARF_LUANLUAN_BLOCK.get(), LootTable.lootTable());
+            add(ModBlocks.TIANSULUO_BATTLE_FACE_LUANLUAN_BLOCK.get(), LootTable.lootTable());
         }
 
         @Override
@@ -63,10 +62,10 @@ public final class ModLootTableProvider {
 
         @Override
         public void generate() {
-            // 实体掉落配置（直接引用 Item 对象，而非硬编码字符串）
-            generateForSpecies(ModEntityTypes.TIANSULUO_PINK_SCARF.get(), List.of(Items.CAKE, ModItems.CHIPS.get()));
-            generateForSpecies(ModEntityTypes.TIANSULUO_BATTLE_FACE.get(), List.of(Items.CAKE, ModItems.CHIPS.get()));
-            generateForSpecies(ModEntityTypes.SUXIA.get(), List.of(Items.COD));
+            // 天素罗掉落由实体类运行时控制，但仍需生成空表满足 EntityLootSubProvider 的已知实体校验。
+            this.add(ModEntityTypes.TIANSULUO_PINK_SCARF.get(), LootTable.lootTable());
+            this.add(ModEntityTypes.TIANSULUO_BATTLE_FACE.get(), LootTable.lootTable());
+            generateForSpecies(ModEntityTypes.SUXIA.get(), List.of(ModItems.XIAMI_HUHU.get()));
         }
 
         private void generateForSpecies(EntityType<?> type, List<Item> lootItems) {

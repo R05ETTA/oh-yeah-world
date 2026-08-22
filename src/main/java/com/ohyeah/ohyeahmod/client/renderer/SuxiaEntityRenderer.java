@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.ohyeah.ohyeahmod.OhYeah;
 import com.ohyeah.ohyeahmod.client.model.SuxiaEntityModel;
-import com.ohyeah.ohyeahmod.entity.SuxiaEntity;
+import com.ohyeah.ohyeahmod.entity.suxia.SuxiaEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +14,7 @@ public class SuxiaEntityRenderer extends MobRenderer<SuxiaEntity, SuxiaEntityMod
             ResourceLocation.fromNamespaceAndPath(OhYeah.MODID, "textures/entity/suxia.png");
 
     public SuxiaEntityRenderer(EntityRendererProvider.Context context) {
-        super(context, new SuxiaEntityModel<>(context.bakeLayer(SuxiaEntityModel.LAYER_LOCATION)), 0.7F);
+        super(context, new SuxiaEntityModel<>(context.bakeLayer(SuxiaEntityModel.LAYER_LOCATION)), 0.5F);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class SuxiaEntityRenderer extends MobRenderer<SuxiaEntity, SuxiaEntityMod
     ) {
         super.setupRotations(entity, poseStack, bob, yBodyRot, partialTick, scale);
         poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
-        float renderScale = 0.8F;
+        float renderScale = 0.5F;
         poseStack.scale(renderScale, renderScale, renderScale);
     }
 }

@@ -1,8 +1,8 @@
 package com.ohyeah.ohyeahmod.worldgen;
 
-import com.ohyeah.ohyeahmod.entity.SuxiaEntity;
-import com.ohyeah.ohyeahmod.entity.TiansuluoBattleFaceEntity;
-import com.ohyeah.ohyeahmod.entity.TiansuluoPinkScarfEntity;
+import com.ohyeah.ohyeahmod.entity.suxia.SuxiaProfile;
+import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.BattleFaceProfile;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
 import java.util.List;
 
 /**
@@ -18,28 +18,28 @@ public final class ModEntityBiomeModifiers {
     public static List<NaturalSpawnPlan> naturalSpawns() {
         return List.of(
                 new NaturalSpawnPlan(
-                        "tiansuluo_pink_scarf_spawn", 
-                        TiansuluoPinkScarfEntity.SPECIES_ID, 
-                        TiansuluoPinkScarfEntity.SPAWN_WEIGHT, 
-                        TiansuluoPinkScarfEntity.SPAWN_MIN_GROUP, 
-                        TiansuluoPinkScarfEntity.SPAWN_MAX_GROUP, 
-                        TiansuluoPinkScarfEntity.SPAWN_BIOMES
+                        "tiansuluo_pink_scarf_spawn",
+                        PinkScarfProfile.SPECIES_ID,
+                        PinkScarfProfile.SPAWN_WEIGHT,
+                        PinkScarfProfile.SPAWN_MIN_GROUP,
+                        PinkScarfProfile.SPAWN_MAX_GROUP,
+                        PinkScarfProfile.SPAWN_BIOMES
                 ),
                 new NaturalSpawnPlan(
-                        "tiansuluo_battle_face_spawn", 
-                        TiansuluoBattleFaceEntity.SPECIES_ID, 
-                        TiansuluoBattleFaceEntity.SPAWN_WEIGHT, 
-                        TiansuluoBattleFaceEntity.SPAWN_MIN_GROUP, 
-                        TiansuluoBattleFaceEntity.SPAWN_MAX_GROUP, 
-                        TiansuluoBattleFaceEntity.SPAWN_BIOMES
+                        "tiansuluo_battle_face_spawn",
+                        BattleFaceProfile.SPECIES_ID,
+                        BattleFaceProfile.SPAWN_WEIGHT,
+                        BattleFaceProfile.SPAWN_MIN_GROUP,
+                        BattleFaceProfile.SPAWN_MAX_GROUP,
+                        BattleFaceProfile.SPAWN_BIOMES
                 ),
                 new NaturalSpawnPlan(
-                        "suxia_spawn", 
-                        SuxiaEntity.SPECIES_ID, 
-                        SuxiaEntity.SPAWN_WEIGHT, 
-                        SuxiaEntity.SPAWN_MIN_GROUP, 
-                        SuxiaEntity.SPAWN_MAX_GROUP, 
-                        SuxiaEntity.DEFAULT_SPAWN_BIOMES
+                        "suxia_spawn",
+                        SuxiaProfile.SPECIES_ID,
+                        SuxiaProfile.SPAWN_WEIGHT,
+                        SuxiaProfile.SPAWN_MIN_GROUP,
+                        SuxiaProfile.SPAWN_MAX_GROUP,
+                        SuxiaProfile.DEFAULT_SPAWN_BIOMES
                 )
         );
     }
@@ -52,11 +52,11 @@ public final class ModEntityBiomeModifiers {
      * 内部记录类，用于 Datagen 将计划转换为 JSON 格式。
      */
     public record NaturalSpawnPlan(
-            String planId, 
-            String speciesId, 
-            int weight, 
-            int minGroup, 
-            int maxGroup, 
+            String planId,
+            String speciesId,
+            int weight,
+            int minGroup,
+            int maxGroup,
             List<String> biomes
     ) {
         @Override

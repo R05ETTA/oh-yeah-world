@@ -1,7 +1,7 @@
 package com.ohyeah.ohyeahmod.client.model;
 
 import com.ohyeah.ohyeahmod.OhYeah;
-import com.ohyeah.ohyeahmod.entity.TiansuluoBattleFaceEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.TiansuluoBattleFaceEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;

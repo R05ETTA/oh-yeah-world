@@ -6,7 +6,7 @@ import com.ohyeah.ohyeahmod.client.model.TiansuluoPinkScarfEntityModel;
 import com.ohyeah.ohyeahmod.client.renderer.SuxiaEntityRenderer;
 import com.ohyeah.ohyeahmod.client.renderer.TiansuluoBattleFaceEntityRenderer;
 import com.ohyeah.ohyeahmod.client.renderer.TiansuluoPinkScarfEntityRenderer;
-import com.ohyeah.ohyeahmod.entity.projectile.TiansuluoPinkScarfProjectileEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProjectileEntity;
 import com.ohyeah.ohyeahmod.registry.ModEntityTypes;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -28,7 +28,7 @@ public final class ClientEntityRenderers {
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntityTypes.TIANSULUO_PINK_SCARF.get(), TiansuluoPinkScarfEntityRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.TIANSULUO_BATTLE_FACE.get(), TiansuluoBattleFaceEntityRenderer::new);
-        event.registerEntityRenderer(ModEntityTypes.TIANSULUO_PINK_SCARF_PROJECTILE.get(), context -> new ThrownItemRenderer<TiansuluoPinkScarfProjectileEntity>(context, 1.0F, true));
+        event.registerEntityRenderer(ModEntityTypes.TIANSULUO_PINK_SCARF_PROJECTILE.get(), context -> new ThrownItemRenderer<PinkScarfProjectileEntity>(context, 1.0F, true));
         event.registerEntityRenderer(ModEntityTypes.SUXIA.get(), SuxiaEntityRenderer::new);
     }
 }

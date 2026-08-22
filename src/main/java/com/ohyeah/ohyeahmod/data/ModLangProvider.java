@@ -71,16 +71,11 @@ public abstract class ModLangProvider extends LanguageProvider {
 
             // Subtitles - Tiansuluo (Battle Face)
             add("subtitles.ohyeah.tiansuluo.ambient", "Battle Face Tiansuluo murmurs softly");
-            add("subtitles.ohyeah.tiansuluo.rare_call", "Battle Face Tiansuluo makes a rare call");
             add("subtitles.ohyeah.tiansuluo.hurt", "Battle Face Tiansuluo cries out");
             add("subtitles.ohyeah.tiansuluo.death", "Battle Face Tiansuluo collapses");
             add("subtitles.ohyeah.tiansuluo.eat", "Battle Face Tiansuluo is chewing");
             add("subtitles.ohyeah.tiansuluo.eat_favorite", "Battle Face Tiansuluo happily chews favorite food");
-            add("subtitles.ohyeah.tiansuluo.tempted", "Battle Face Tiansuluo is attracted");
-            add("subtitles.ohyeah.tiansuluo.notice_player", "Battle Face Tiansuluo notices someone");
-            add("subtitles.ohyeah.tiansuluo.spawn", "Battle Face Tiansuluo appears");
             add("subtitles.ohyeah.tiansuluo.breed_success", "Battle Face Tiansuluo chirps happily");
-            add("subtitles.ohyeah.tiansuluo.carry_egg", "Battle Face Tiansuluo shows off its Luanluan");
             add("subtitles.ohyeah.tiansuluo.attack_shot", "Battle Face Tiansuluo pounces!");
             add("subtitles.ohyeah.tiansuluo.attack_end", "Battle Face Tiansuluo ends pounce");
             add("subtitles.ohyeah.tiansuluo.attack_declare", "Battle Face Tiansuluo roars for battle");
@@ -89,16 +84,11 @@ public abstract class ModLangProvider extends LanguageProvider {
 
             // Subtitles - Tiansuluo (Pink Scarf)
             add("subtitles.ohyeah.tiansuluo_ps.ambient", "Pink Scarf Tiansuluo murmurs softly");
-            add("subtitles.ohyeah.tiansuluo_ps.rare_call", "Pink Scarf Tiansuluo makes a rare call");
             add("subtitles.ohyeah.tiansuluo_ps.hurt", "Pink Scarf Tiansuluo cries out");
             add("subtitles.ohyeah.tiansuluo_ps.death", "Pink Scarf Tiansuluo collapses");
             add("subtitles.ohyeah.tiansuluo_ps.eat", "Pink Scarf Tiansuluo is chewing");
             add("subtitles.ohyeah.tiansuluo_ps.eat_favorite", "Pink Scarf Tiansuluo happily chews favorite food");
-            add("subtitles.ohyeah.tiansuluo_ps.tempted", "Pink Scarf Tiansuluo is attracted");
-            add("subtitles.ohyeah.tiansuluo_ps.notice_player", "Pink Scarf Tiansuluo notices someone");
-            add("subtitles.ohyeah.tiansuluo_ps.spawn", "Pink Scarf Tiansuluo appears");
             add("subtitles.ohyeah.tiansuluo_ps.breed_success", "Pink Scarf Tiansuluo chirps happily");
-            add("subtitles.ohyeah.tiansuluo_ps.carry_egg", "Pink Scarf Tiansuluo shows off its Luanluan");
             add("subtitles.ohyeah.tiansuluo_ps.attack_shot", "Pink Scarf Tiansuluo fires a projectile!");
             add("subtitles.ohyeah.tiansuluo_ps.attack_end", "Pink Scarf Tiansuluo stops firing");
             add("subtitles.ohyeah.tiansuluo_ps.attack_declare", "Pink Scarf Tiansuluo prepares to shoot");
@@ -109,6 +99,7 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.suxia.ambient", "Suxia chirps softly");
             add("subtitles.ohyeah.suxia.hurt", "Suxia is hurt");
             add("subtitles.ohyeah.suxia.death", "Suxia dies");
+            add("subtitles.ohyeah.suxia.squirt", "Suxia sprays ink");
         }
     }
 
@@ -151,7 +142,7 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("itemGroup.ohyeah.main", "哦耶！");
 
             // Messages - Pink Scarf
-            add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_carried", "天素罗_粉围巾已进入带蛋状态，会在你附近寻找位置放置栾栾块");
+            add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_carried", "天素罗_粉围巾已进入带蛋状态，会在自身附近寻找最近的合法位置放置栾栾块");
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_placed", "天素罗_粉围巾已放置栾栾块，当前块数：%s");
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_hatch_progress", "粉围巾栾栾块孵化进度：第 %s / %s 阶段");
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_hatched", "粉围巾栾栾块已孵化，诞生幼体数量：%s");
@@ -166,16 +157,11 @@ public abstract class ModLangProvider extends LanguageProvider {
 
             // Subtitles - Tiansuluo (Battle Face)
             add("subtitles.ohyeah.tiansuluo.ambient", "天素罗_战斗脸轻声呢喃");
-            add("subtitles.ohyeah.tiansuluo.rare_call", "天素罗_战斗脸发出稀有呼唤");
             add("subtitles.ohyeah.tiansuluo.hurt", "天素罗_战斗脸发出痛叫");
             add("subtitles.ohyeah.tiansuluo.death", "天素罗_战斗脸瘫软倒下");
             add("subtitles.ohyeah.tiansuluo.eat", "天素罗_战斗脸在咀嚼");
             add("subtitles.ohyeah.tiansuluo.eat_favorite", "天素罗_战斗脸开心地吃着最爱的食物");
-            add("subtitles.ohyeah.tiansuluo.tempted", "天素罗_战斗脸被吸引了");
-            add("subtitles.ohyeah.tiansuluo.notice_player", "天素罗_战斗脸注意到了谁");
-            add("subtitles.ohyeah.tiansuluo.spawn", "天素罗_战斗脸出现了");
             add("subtitles.ohyeah.tiansuluo.breed_success", "天素罗_战斗脸发出欢快叫声");
-            add("subtitles.ohyeah.tiansuluo.carry_egg", "天素罗_战斗脸炫耀地展示栾栾");
             add("subtitles.ohyeah.tiansuluo.attack_shot", "天素罗_战斗脸发起了飞扑！");
             add("subtitles.ohyeah.tiansuluo.attack_end", "天素罗_战斗脸结束了扑击");
             add("subtitles.ohyeah.tiansuluo.attack_declare", "天素罗_战斗脸发出战斗怒吼");
@@ -184,16 +170,11 @@ public abstract class ModLangProvider extends LanguageProvider {
 
             // Subtitles - Tiansuluo (Pink Scarf)
             add("subtitles.ohyeah.tiansuluo_ps.ambient", "天素罗_粉围巾轻声呢喃");
-            add("subtitles.ohyeah.tiansuluo_ps.rare_call", "天素罗_粉围巾发出稀有呼唤");
             add("subtitles.ohyeah.tiansuluo_ps.hurt", "天素罗_粉围巾发出痛叫");
             add("subtitles.ohyeah.tiansuluo_ps.death", "天素罗_粉围巾瘫软倒下");
             add("subtitles.ohyeah.tiansuluo_ps.eat", "天素罗_粉围巾在咀嚼");
             add("subtitles.ohyeah.tiansuluo_ps.eat_favorite", "天素罗_粉围巾开心地吃着最爱的食物");
-            add("subtitles.ohyeah.tiansuluo_ps.tempted", "天素罗_粉围巾被吸引了");
-            add("subtitles.ohyeah.tiansuluo_ps.notice_player", "天素罗_粉围巾注意到了谁");
-            add("subtitles.ohyeah.tiansuluo_ps.spawn", "天素罗_粉围巾出现了");
             add("subtitles.ohyeah.tiansuluo_ps.breed_success", "天素罗_粉围巾发出欢快叫声");
-            add("subtitles.ohyeah.tiansuluo_ps.carry_egg", "天素罗_粉围巾炫耀地展示栾栾");
             add("subtitles.ohyeah.tiansuluo_ps.attack_shot", "天素罗_粉围巾喷射了光波！");
             add("subtitles.ohyeah.tiansuluo_ps.attack_end", "天素罗_粉围巾停止了射击");
             add("subtitles.ohyeah.tiansuluo_ps.attack_declare", "天素罗_粉围巾准备发射弹幕");
@@ -204,6 +185,7 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.suxia.ambient", "素虾轻轻漫游");
             add("subtitles.ohyeah.suxia.hurt", "素虾受伤了");
             add("subtitles.ohyeah.suxia.death", "素虾倒下了");
+            add("subtitles.ohyeah.suxia.squirt", "素虾喷出墨汁");
         }
     }
 }

@@ -25,7 +25,7 @@ public final class SleepWakeGameplayCoordinator {
 
     static {
         // [注册机] 在此注册所有的睡眠唤醒 Spawner
-        register(com.ohyeah.ohyeahmod.entity.tiansuluo.spawn.TiansuluoPinkScarfBedWakeSpawner.INSTANCE);
+        register(com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.spawn.TiansuluoPinkScarfBedWakeSpawner.INSTANCE);
     }
 
     private SleepWakeGameplayCoordinator() {

@@ -1,25 +1,113 @@
+# Oh Yeah Mod
 
-Installation information
-=======
+Oh Yeah 是一个适用于 Minecraft 1.21.1 / NeoForge 21.1.223 的生物玩法模组，加入三种自定义生物：粉围巾、战颜和素虾。
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+## 下载与安装
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+### 正式版本
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+正式版本会在发布后出现在 GitHub 的 **Releases** 页面：
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+1. 打开本项目 GitHub 页面的 **Releases**。
+2. 选择需要的版本。
+3. 下载其中的 `ohyeah-*.jar`。
+4. 将 JAR 文件放入 Minecraft 实例的 `mods` 文件夹。
+5. 使用以下版本启动：
+   - Minecraft `1.21.1`
+   - NeoForge `21.1.223`
+   - Java `21`
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+### 开发测试版本
+
+维护者也可以从 GitHub **Actions → Build → Artifacts** 下载 `ohyeah-mod`。该文件用于开发测试，不代表正式发布版本。
+
+## 生物玩法
+
+### 粉围巾
+
+- 可驯服、喂食成长和治疗。
+- 喜欢食物：小麦、胡萝卜、甜菜根、马铃薯。
+- 最爱食物：蛋糕、`ohyeah:chips`。
+- 成年后可以繁殖，生成粉围巾栾栾块。
+- 使用剪刀可以获得红羊毛，并使其进入禁声状态。
+- 受到攻击后会进行最多 6 发远程连射反击。
+- 已驯服时，主人攻击其他生物，粉围巾会加入战斗。
+- 主人误伤已驯服粉围巾时，粉围巾仍会反击主人。
+
+### 战颜（Battle Face）
+
+- 可驯服、喂食成长和治疗。
+- 喜欢食物：小麦、胡萝卜、甜菜根、马铃薯。
+- 最爱食物：`ohyeah:chips`。
+- 成年后可以繁殖，生成战颜栾栾块。
+- 使用剪刀可以获得红羊毛，并使其进入禁声状态。
+- 受到攻击后会执行“宣言 → 靠近 → 近身扑击 → 冷却/结束”的战斗链。
+- 已驯服时，主人攻击其他生物，战颜会加入战斗。
+- 主人误伤已驯服战颜时，战颜仍会反击主人。
+
+### 素虾
+
+- 轻量水生生物，在海洋和河流相关水域生成。
+- 手持 `ohyeah:chips` 时会靠近玩家。
+- 薯片只会诱食，不会驯服素虾，也不会使其繁殖。
+- 水中受伤或死亡时会喷墨。
+- 死亡时掉落 `ohyeah:xiami_huhu`。
+- 支持原版拴绳。
+
+## 快速体验
+
+建议创建创造模式新世界，并使用以下命令生成实体：
+
+```mcfunction
+/summon ohyeah:tiansuluo_pink_scarf ~ ~ ~ {PersistenceRequired:1b}
+/summon ohyeah:tiansuluo_battle_face ~ ~ ~ {PersistenceRequired:1b}
+/summon ohyeah:suxia ~ ~ ~ {PersistenceRequired:1b}
+```
+
+常用物品和方块 ID：
+
+```text
+ohyeah:chips
+ohyeah:xiami_huhu
+ohyeah:tiansuluo_pink_scarf_egg
+ohyeah:tiansuluo_battle_face_egg
+ohyeah:suxia_egg
+ohyeah:tiansuluo_pink_scarf_luanluan_block
+ohyeah:tiansuluo_battle_face_luanluan_block
+```
+
+## 声音说明
+
+Oh Yeah 只管理粉围巾、战颜和素虾的自定义物种声音，包括环境、受伤、死亡、进食、成长、繁殖、战斗、剪刀和喷墨反馈音。
+
+剪刀工具音、栾栾块放置音、方块音、脚步声和世界环境音仍由 Minecraft 原生系统处理。
+
+## 常见问题
+
+### Mod 没有加载
+
+确认以下内容完全匹配：
+
+- Minecraft `1.21.1`
+- NeoForge `21.1.223`
+- Java `21`
+- JAR 文件位于当前实例的 `mods` 文件夹中
+
+### 找不到生物
+
+第一次体验建议使用上面的 `/summon` 命令，不要先等待自然生成。自然生成会受到群系、水体和随机生成条件影响。
+
+### GitHub Actions 没有 JAR
+
+只有成功完成的 **Build** 工作流才会上传 `ohyeah-mod` Artifact。若工作流失败，请先查看构建日志，再使用成功的工作流运行记录下载 JAR。
+
+## 项目状态
+
+当前版本已经完成客户端人工回归，核心的喂食、声音、主人协同攻击、误伤反击和战颜扑击没有发现明显异常。
+
+后续版本仍可能继续调整生物行为、资源和数值。使用问题请记录：
+
+- Minecraft、NeoForge 和 Java 版本
+- Mod JAR 来源对应的 GitHub Actions 工作流
+- 复现步骤
+- 游戏日志或截图

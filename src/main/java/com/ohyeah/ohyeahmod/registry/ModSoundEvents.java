@@ -12,16 +12,11 @@ public final class ModSoundEvents {
     private static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(Registries.SOUND_EVENT, OhYeah.MODID);
 
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_AMBIENT = register("tiansuluo.ambient");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_RARE_CALL = register("tiansuluo.rare_call");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_HURT = register("tiansuluo.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_DEATH = register("tiansuluo.death");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_EAT = register("tiansuluo.eat");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_EAT_FAVORITE = register("tiansuluo.eat_favorite");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_TEMPTED = register("tiansuluo.tempted");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_NOTICE_PLAYER = register("tiansuluo.notice_player");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_SPAWN = register("tiansuluo.spawn");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_BREED_SUCCESS = register("tiansuluo.breed_success");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_CARRY_EGG = register("tiansuluo.carry_egg");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_ATTACK_SHOT = register("tiansuluo.attack_shot");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_ATTACK_END = register("tiansuluo.attack_end");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_ATTACK_DECLARE = register("tiansuluo.attack_declare");
@@ -29,16 +24,11 @@ public final class ModSoundEvents {
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_SHEAR_REACT = register("tiansuluo.shear_react");
 
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_AMBIENT = register("tiansuluo_ps.ambient");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_RARE_CALL = register("tiansuluo_ps.rare_call");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_HURT = register("tiansuluo_ps.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_DEATH = register("tiansuluo_ps.death");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_EAT = register("tiansuluo_ps.eat");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_EAT_FAVORITE = register("tiansuluo_ps.eat_favorite");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_TEMPTED = register("tiansuluo_ps.tempted");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_NOTICE_PLAYER = register("tiansuluo_ps.notice_player");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_SPAWN = register("tiansuluo_ps.spawn");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_BREED_SUCCESS = register("tiansuluo_ps.breed_success");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_CARRY_EGG = register("tiansuluo_ps.carry_egg");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_ATTACK_SHOT = register("tiansuluo_ps.attack_shot");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_ATTACK_END = register("tiansuluo_ps.attack_end");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_ATTACK_DECLARE = register("tiansuluo_ps.attack_declare");
@@ -48,7 +38,7 @@ public final class ModSoundEvents {
     public static final DeferredHolder<SoundEvent, SoundEvent> SUXIA_AMBIENT = register("suxia.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> SUXIA_HURT = register("suxia.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> SUXIA_DEATH = register("suxia.death");
-
+    public static final DeferredHolder<SoundEvent, SoundEvent> SUXIA_SQUIRT = register("suxia.squirt");
     private ModSoundEvents() {
     }
 

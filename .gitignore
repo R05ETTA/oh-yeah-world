@@ -28,6 +28,7 @@ bin/
 
 ### VS Code ###
 .vscode/
+*.cmd
 
 ### Mac OS ###
 .DS_Store
@@ -36,6 +37,7 @@ bin/
 run/
 !**/src/**/run/
 **/src/generated/**/.cache/
+src/generated/resources/
 repo/
 !**/src/**/repo/
 

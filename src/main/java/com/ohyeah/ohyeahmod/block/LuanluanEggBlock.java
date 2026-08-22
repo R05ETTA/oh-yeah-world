@@ -1,7 +1,7 @@
 package com.ohyeah.ohyeahmod.block;
 
-import com.ohyeah.ohyeahmod.entity.TiansuluoBattleFaceEntity;
-import com.ohyeah.ohyeahmod.entity.TiansuluoPinkScarfEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.BattleFaceProfile;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
@@ -55,7 +55,7 @@ public final class LuanluanEggBlock extends Block {
         for (int i = 0; i < eggs; i++) {
             var entity = this.entityTypeSupplier.get().create(level);
             if (entity instanceof AgeableMob ageable) {
-                ageable.setAge(-24000);
+                ageable.setAge(AgeableMob.BABY_START_AGE);
                 ageable.moveTo(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, level.random.nextFloat() * 360.0F, 0.0F);
                 level.addFreshEntity(ageable);
             }
@@ -64,10 +64,15 @@ public final class LuanluanEggBlock extends Block {
 
     private boolean shouldHatch(Level level) {
         int chanceInv = 500;
-        if (TiansuluoPinkScarfEntity.SPECIES_ID.equals(this.speciesId)) chanceInv = TiansuluoPinkScarfEntity.HATCH_CHANCE_INV;
-        else if (TiansuluoBattleFaceEntity.SPECIES_ID.equals(this.speciesId)) chanceInv = TiansuluoBattleFaceEntity.HATCH_CHANCE_INV;
-        
-        return level.random.nextInt(chanceInv) == 0;
+        if (PinkScarfProfile.SPECIES_ID.equals(this.speciesId)) {
+            chanceInv = PinkScarfProfile.HATCH_CHANCE_INV;
+        } else if (BattleFaceProfile.SPECIES_ID.equals(this.speciesId)) {
+            chanceInv = BattleFaceProfile.HATCH_CHANCE_INV;
+        }
+
+        /* 与原版 TurtleEggBlock 一致：夜间窗口稳定推进，其他时间保留随机推进。 */
+        float timeOfDay = level.getTimeOfDay(1.0F);
+        return timeOfDay > 0.65F && timeOfDay < 0.69F || level.random.nextInt(chanceInv) == 0;
     }
 
     @Override

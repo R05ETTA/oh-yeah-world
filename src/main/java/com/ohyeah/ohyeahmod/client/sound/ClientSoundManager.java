@@ -1,5 +1,7 @@
 package com.ohyeah.ohyeahmod.client.sound;
 
+import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.TiansuluoBattleFaceEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.TiansuluoPinkScarfEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -10,127 +12,161 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * 客户端声音管理器 (主动注册版)。
- * 负责环境音的全局并发控制、静默冷却、以及动作音的打断。
+ * Oh Yeah 自定义物种声音管理器。
+ *
+ * <p>这里只管理由 Oh Yeah 创建的物种声音实例，不接管 Minecraft 的世界声音。
+ * 同一实体同时只保留一个自定义声音实例；高优先级声音可以打断低优先级声音。</p>
  */
 @OnlyIn(Dist.CLIENT)
 public final class ClientSoundManager {
-    // 跟踪每个实体当前活跃的声音实例
-    private static final Map<Integer, SoundInstance> ACTIVE_SOUNDS = new HashMap<>();
-    // 跟踪每个实体的个人发声计时器
-    private static final Map<Integer, Integer> ENTITY_TIMERS = new HashMap<>();
-    
-    private static long lastAmbientEndTime = 0;
-    private static boolean isAmbientOccupied = false;
-    private static final long GLOBAL_COOLDOWN_MS = 2000; // 说话后的 2 秒绝对静默
+    private static final Map<Integer, ActiveSound> ACTIVE_SOUNDS = new HashMap<>();
+    private static final Map<Integer, Set<SoundInstance>> OVERLAY_SOUNDS = new HashMap<>();
 
-    /**
-     * 每一帧更新管理器状态。
-     */
+    /** 每一帧清理已经播放完毕的物种声音。 */
     public static void update() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;
+        if (mc.level == null) {
+            stopAll();
+            return;
+        }
 
-        var iterator = ACTIVE_SOUNDS.entrySet().iterator();
+        Iterator<Map.Entry<Integer, ActiveSound>> iterator = ACTIVE_SOUNDS.entrySet().iterator();
         while (iterator.hasNext()) {
-            var entry = iterator.next();
-            SoundInstance instance = entry.getValue();
-            
-            // 如果声音已播放结束或实例无效
-            if (!mc.getSoundManager().isActive(instance)) {
-                if (instance.getSource() == SoundSource.AMBIENT) {
-                    releaseAmbient();
-                }
+            ActiveSound active = iterator.next().getValue();
+            if (!mc.getSoundManager().isActive(active.instance())) {
                 iterator.remove();
             }
         }
-    }
 
-    /**
-     * 实体的 Tick 钩子，由实体类主动调用。
-     */
-    public static void tick(LivingEntity entity, SoundEvent ambientSound) {
-        if (ambientSound == null || !entity.isAlive()) return;
-
-        int entityId = entity.getId();
-        int timer = ENTITY_TIMERS.getOrDefault(entityId, 40); // 初始给 2 秒缓冲
-
-        if (--timer <= 0) {
-            // 尝试申请发言权
-            if (canSpeak(entity)) {
-                playAmbient(entity, ambientSound);
-                // 成功后：设置长冷却 (10-20秒)
-                ENTITY_TIMERS.put(entityId, 200 + entity.getRandom().nextInt(200));
-            } else {
-                // 失败后：设置短重试 (1秒)
-                ENTITY_TIMERS.put(entityId, 20);
+        Iterator<Map.Entry<Integer, Set<SoundInstance>>> overlayEntities = OVERLAY_SOUNDS.entrySet().iterator();
+        while (overlayEntities.hasNext()) {
+            Set<SoundInstance> overlays = overlayEntities.next().getValue();
+            overlays.removeIf(instance -> !mc.getSoundManager().isActive(instance));
+            if (overlays.isEmpty()) {
+                overlayEntities.remove();
             }
-        } else {
-            ENTITY_TIMERS.put(entityId, timer);
         }
     }
 
-    private static boolean canSpeak(LivingEntity entity) {
-        // 1. 是否有人正在说背景音？
-        if (isAmbientOccupied) return false;
-        
-        // 2. 是否处于全局静默冷却期？
-        if (System.currentTimeMillis() < lastAmbientEndTime + GLOBAL_COOLDOWN_MS) return false;
-
-        // 3. 距离校验 (24格)
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || entity.distanceToSqr(mc.player) > 576.0D) return false;
-
-        return true;
+    /**
+     * 按物种环境音间隔尝试播放一次环境音。
+     * 环境音由客户端本地调度，避免服务端为低价值声音持续广播事件。
+     */
+    public static void playAmbient(LivingEntity entity, SoundEvent sound, int interval) {
+        if (interval <= 0 || entity.tickCount % interval != 0 || entity.getRandom().nextInt(3) != 0) {
+            return;
+        }
+        playAction(entity, sound, SoundSource.NEUTRAL, 10, false);
     }
 
-    private static void playAmbient(LivingEntity entity, SoundEvent sound) {
-        stopSound(entity); // 确保同一个实体不重叠
-        
-        EntityBoundSoundInstance instance = new EntityBoundSoundInstance(
-                sound, SoundSource.AMBIENT, 1.0F, 1.0F, entity, entity.level().getRandom().nextLong()
-        );
-        
-        isAmbientOccupied = true;
-        ACTIVE_SOUNDS.put(entity.getId(), instance);
-        Minecraft.getInstance().getSoundManager().play(instance);
+    /** 播放普通物种动作音。 */
+    public static void playAction(LivingEntity entity, SoundEvent sound, SoundSource source) {
+        playAction(entity, sound, source, 0, false);
     }
 
     /**
-     * 播放一次性动作反馈音 (如受伤、吃东西)。
-     * 优先级最高，无视限流，并打断背景音。
+     * 播放物种声音。
+     *
+     * @param priority 越大越优先；低优先级声音不会打断正在播放的高优先级声音
+     * @param allowWhenSilenced 禁声状态下是否仍允许播放
      */
-    public static void playAction(LivingEntity entity, SoundEvent sound, SoundSource source) {
-        if (sound == null) return;
-        stopSound(entity);
-        
+    public static void playAction(
+            LivingEntity entity,
+            SoundEvent sound,
+            SoundSource source,
+            int priority,
+            boolean allowWhenSilenced
+    ) {
+        if (sound == null || isSilenced(entity) && !allowWhenSilenced) {
+            return;
+        }
+
+        Minecraft mc = Minecraft.getInstance();
+        ActiveSound active = ACTIVE_SOUNDS.get(entity.getId());
+        if (active != null) {
+            if (mc.getSoundManager().isActive(active.instance()) && active.priority() > priority) {
+                return;
+            }
+            stopSound(entity);
+        }
+
         EntityBoundSoundInstance instance = new EntityBoundSoundInstance(
-                sound, source, 1.0F, 1.0F, entity, entity.level().getRandom().nextLong()
+                sound,
+                source,
+                1.0F,
+                1.0F,
+                entity,
+                entity.level().getRandom().nextLong()
         );
-        
-        ACTIVE_SOUNDS.put(entity.getId(), instance);
+        ACTIVE_SOUNDS.put(entity.getId(), new ActiveSound(instance, priority));
+        mc.getSoundManager().play(instance);
+    }
+
+    /** 播放不占用实体主声音槽位的短特效音，例如素虾喷墨。 */
+    public static void playOverlay(LivingEntity entity, SoundEvent sound, SoundSource source) {
+        if (sound == null || isSilenced(entity)) {
+            return;
+        }
+        EntityBoundSoundInstance instance = new EntityBoundSoundInstance(
+                sound,
+                source,
+                1.0F,
+                1.0F,
+                entity,
+                entity.level().getRandom().nextLong()
+        );
+        OVERLAY_SOUNDS.computeIfAbsent(entity.getId(), ignored -> new HashSet<>()).add(instance);
         Minecraft.getInstance().getSoundManager().play(instance);
     }
 
     public static void stopSound(LivingEntity entity) {
-        SoundInstance instance = ACTIVE_SOUNDS.remove(entity.getId());
-        if (instance != null) {
-            Minecraft.getInstance().getSoundManager().stop(instance);
-            if (instance.getSource() == SoundSource.AMBIENT) {
-                releaseAmbient();
+        Minecraft mc = Minecraft.getInstance();
+        ActiveSound active = ACTIVE_SOUNDS.remove(entity.getId());
+        if (active != null) {
+            mc.getSoundManager().stop(active.instance());
+        }
+        Set<SoundInstance> overlays = OVERLAY_SOUNDS.remove(entity.getId());
+        if (overlays != null) {
+            for (SoundInstance overlay : overlays) {
+                mc.getSoundManager().stop(overlay);
             }
         }
     }
 
-    private static void releaseAmbient() {
-        if (isAmbientOccupied) {
-            isAmbientOccupied = false;
-            lastAmbientEndTime = System.currentTimeMillis();
+    /** 清理世界切换或客户端退出时残留的所有物种声音。 */
+    public static void stopAll() {
+        Minecraft mc = Minecraft.getInstance();
+        for (ActiveSound active : ACTIVE_SOUNDS.values()) {
+            mc.getSoundManager().stop(active.instance());
         }
+        for (Set<SoundInstance> overlays : OVERLAY_SOUNDS.values()) {
+            for (SoundInstance overlay : overlays) {
+                mc.getSoundManager().stop(overlay);
+            }
+        }
+        ACTIVE_SOUNDS.clear();
+        OVERLAY_SOUNDS.clear();
     }
 
-    private ClientSoundManager() {}
+    private static boolean isSilenced(LivingEntity entity) {
+        if (entity instanceof TiansuluoPinkScarfEntity pinkScarf) {
+            return pinkScarf.state().isSilenced(pinkScarf);
+        }
+        if (entity instanceof TiansuluoBattleFaceEntity battleFace) {
+            return battleFace.state().isSilenced(battleFace);
+        }
+        return false;
+    }
+
+    private record ActiveSound(SoundInstance instance, int priority) {
+    }
+
+    private ClientSoundManager() {
+    }
 }

@@ -1,16 +1,15 @@
-name: Build
+name: Release
 
 on:
   push:
-    branches:
-      - '**'
-  pull_request:
+    tags:
+      - 'v*'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,17 +28,23 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
+      - name: Verify release tag
+        shell: bash
+        run: |
+          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
+          test "v${version}" = "${GITHUB_REF_NAME}"
+
       - name: Generate resources
         run: ./gradlew runData --no-daemon --console=plain
 
       - name: Build mod
         run: ./gradlew build --no-daemon --console=plain
 
-      - name: Upload development artifact
-        if: github.event_name == 'push'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ohyeah-mod
-          path: build/libs/*.jar
-          if-no-files-found: error
-          retention-days: 14
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}" build/libs/*.jar
+          --verify-tag
+          --generate-notes
+          --title "${GITHUB_REF_NAME}"
