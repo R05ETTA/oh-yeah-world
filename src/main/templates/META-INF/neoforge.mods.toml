@@ -46,7 +46,7 @@ authors="r0setta"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Oh Yeah adds three creatures to Minecraft: Pink Scarf and Battle Face, two tamable Tiansuluo with feeding, breeding, egg blocks, shearing, and retaliation behavior; plus Suxia, a simple aquatic creature.
+Oh Yeah! World adds three creatures to Minecraft: Scarf Luo and Battle Face, two tamable Tiansuluo subspecies with feeding, breeding, egg blocks, shearing, and retaliation behavior; plus Suxia, a simple aquatic creature.
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
