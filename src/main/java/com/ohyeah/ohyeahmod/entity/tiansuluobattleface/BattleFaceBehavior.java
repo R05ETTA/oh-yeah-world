@@ -1,5 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -46,8 +48,12 @@ public final class BattleFaceBehavior {
             return InteractionResult.CONSUME;
         }
 
+        boolean wasSilenced = entity.state().isSilenced(entity);
         entity.consumeInteractionItem(player, hand, stack);
         entity.state().setSilenced(entity, false);
+        if (wasSilenced && player instanceof ServerPlayer serverPlayer) {
+            ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.RESTORE_VOICE);
+        }
 
         if (isBaby) {
             if (favoriteFood) {
@@ -59,12 +65,18 @@ public final class BattleFaceBehavior {
                     entity,
                     favoriteFood ? BattleFaceProfile.EVENT_EAT_FAVORITE : BattleFaceProfile.EVENT_EAT
             );
+            if (player instanceof ServerPlayer serverPlayer) {
+                ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.FEED_GROW);
+            }
             return InteractionResult.SUCCESS;
         }
 
         if (isTamingAttempt) {
             if (entity.getRandom().nextInt(3) == 0 && !EventHooks.onAnimalTame(entity, player)) {
                 entity.tame(player);
+                if (player instanceof ServerPlayer serverPlayer) {
+                    ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.TAME_BATTLE_FACE);
+                }
                 entity.getNavigation().stop();
                 entity.setTarget(null);
                 entity.level().broadcastEntityEvent(entity, (byte) 7);
@@ -118,6 +130,7 @@ public final class BattleFaceBehavior {
             player = partner.getLoveCause();
         }
         if (player != null) {
+            ModAdvancementTracker.award(player, ModAdvancementIds.BREED_TIANSULUO);
             player.awardStat(Stats.ANIMALS_BRED);
             CriteriaTriggers.BRED_ANIMALS.trigger(player, entity, partner, null);
             player.displayClientMessage(

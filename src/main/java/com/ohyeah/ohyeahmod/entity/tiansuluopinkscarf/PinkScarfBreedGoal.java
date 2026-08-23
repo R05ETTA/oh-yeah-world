@@ -1,5 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,6 +40,7 @@ public final class PinkScarfBreedGoal extends BreedGoal {
         }
 
         if (player != null) {
+            ModAdvancementTracker.award(player, ModAdvancementIds.BREED_TIANSULUO);
             player.awardStat(Stats.ANIMALS_BRED);
             CriteriaTriggers.BRED_ANIMALS.trigger(player, this.animal, partner, null);
         }

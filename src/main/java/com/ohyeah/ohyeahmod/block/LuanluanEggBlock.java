@@ -1,5 +1,7 @@
 package com.ohyeah.ohyeahmod.block;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.BattleFaceProfile;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
 import net.minecraft.core.BlockPos;
@@ -51,6 +53,7 @@ public final class LuanluanEggBlock extends Block {
 
     private void hatch(ServerLevel level, BlockPos pos, BlockState state) {
         int eggs = state.getValue(EGGS);
+        int hatchedCount = 0;
         level.removeBlock(pos, false);
         for (int i = 0; i < eggs; i++) {
             var entity = this.entityTypeSupplier.get().create(level);
@@ -58,7 +61,11 @@ public final class LuanluanEggBlock extends Block {
                 ageable.setAge(AgeableMob.BABY_START_AGE);
                 ageable.moveTo(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, level.random.nextFloat() * 360.0F, 0.0F);
                 level.addFreshEntity(ageable);
+                hatchedCount++;
             }
+        }
+        if (hatchedCount > 0) {
+            ModAdvancementTracker.awardNearby(level, pos, ModAdvancementIds.HATCH_LUANLUAN);
         }
     }
 

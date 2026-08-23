@@ -1,5 +1,8 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -23,6 +26,9 @@ public final class BattleFaceShearInteraction {
         entity.level().playSound(null, entity, SoundEvents.SHEEP_SHEAR, SoundSource.PLAYERS, 1.0F, 1.0F);
         entity.level().broadcastEntityEvent(entity, BattleFaceProfile.EVENT_SHEAR_REACT);
         entity.state().setSilenced(entity, true);
+        if (player instanceof ServerPlayer serverPlayer) {
+            ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.SHEAR);
+        }
         return InteractionResult.SUCCESS;
     }
 }

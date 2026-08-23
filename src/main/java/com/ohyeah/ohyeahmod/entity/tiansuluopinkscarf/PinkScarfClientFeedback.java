@@ -31,19 +31,19 @@ public final class PinkScarfClientFeedback {
             return;
         }
         switch (status) {
-            case PinkScarfProfile.EVENT_ATTACK_DECLARE -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_DECLARE.get(), SoundSource.NEUTRAL, 70, false);
-            case PinkScarfProfile.EVENT_GROW_UP -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_GROW_UP.get(), SoundSource.NEUTRAL, 50, false);
-            case PinkScarfProfile.EVENT_SHEAR_REACT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_SHEAR_REACT.get(), SoundSource.NEUTRAL, 90, true);
-            case PinkScarfProfile.EVENT_EAT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_EAT.get(), SoundSource.NEUTRAL, 30, true);
-            case PinkScarfProfile.EVENT_EAT_FAVORITE -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_EAT_FAVORITE.get(), SoundSource.NEUTRAL, 35, true);
-            case PinkScarfProfile.EVENT_ATTACK_SHOT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_SHOT.get(), SoundSource.NEUTRAL, 60, false);
-            case PinkScarfProfile.EVENT_ATTACK_END -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_END.get(), SoundSource.NEUTRAL, 65, false);
-            case PinkScarfProfile.EVENT_HURT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_HURT.get(), SoundSource.NEUTRAL, 60, false);
+            case PinkScarfProfile.EVENT_ATTACK_DECLARE -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_DECLARE.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_DECLARE, false);
+            case PinkScarfProfile.EVENT_GROW_UP -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_GROW_UP.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_GROW_UP, false);
+            case PinkScarfProfile.EVENT_SHEAR_REACT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_SHEAR_REACT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_SHEAR, true);
+            case PinkScarfProfile.EVENT_EAT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_EAT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_EAT, true);
+            case PinkScarfProfile.EVENT_EAT_FAVORITE -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_EAT_FAVORITE.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_EAT_FAVORITE, true);
+            case PinkScarfProfile.EVENT_ATTACK_SHOT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_SHOT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_SHOT, false);
+            case PinkScarfProfile.EVENT_ATTACK_END -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_END.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_END, false);
+            case PinkScarfProfile.EVENT_HURT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_HURT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_HURT, false);
             case PinkScarfProfile.EVENT_DEATH -> {
                 ClientSoundManager.stopSound(entity);
-                ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_DEATH.get(), SoundSource.NEUTRAL, 100, false);
+                ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_DEATH.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_DEATH, false);
             }
-            case PinkScarfProfile.EVENT_BREED_SUCCESS -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_BREED_SUCCESS.get(), SoundSource.NEUTRAL, 50, false);
+            case PinkScarfProfile.EVENT_BREED_SUCCESS -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_BREED_SUCCESS.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_BREED_SUCCESS, false);
             default -> {
             }
         }

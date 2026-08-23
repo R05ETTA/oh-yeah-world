@@ -16,7 +16,7 @@ public final class SuxiaClientFeedback {
                     entity,
                     ModSoundEvents.SUXIA_HURT.get(),
                     SoundSource.NEUTRAL,
-                    60,
+                    ClientSoundManager.PRIORITY_HURT,
                     false
             );
             case SuxiaProfile.EVENT_DEATH -> {
@@ -25,7 +25,7 @@ public final class SuxiaClientFeedback {
                         entity,
                         ModSoundEvents.SUXIA_DEATH.get(),
                         SoundSource.NEUTRAL,
-                        100,
+                        ClientSoundManager.PRIORITY_DEATH,
                         false
                 );
             }

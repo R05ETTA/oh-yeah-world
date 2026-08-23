@@ -1,5 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -91,6 +93,7 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
             this.feedback.tickClient(this);
             return;
         }
+        ModAdvancementTracker.checkEncounter(this, ModAdvancementIds.MEET_BATTLE_FACE, "battle_face");
 
         if (this.state.wasBabyLastTick() && !this.isBaby()) {
             this.level().broadcastEntityEvent(this, BattleFaceProfile.EVENT_GROW_UP);

@@ -20,9 +20,9 @@ import java.util.List;
 public final class PinkScarfProfile {
     public static final String SPECIES_ID = "tiansuluo_pink_scarf";
 
-    /** 成年实体尺寸；幼体尺寸由 AgeableMob 的原生缩放处理。 */
-    public static final float WIDTH = 0.6F;
-    public static final float HEIGHT = 1.8F;
+    /** 成年实体尺寸；幼体由 AgeableMob 缩放。视觉主体经 0.60 渲染缩放后约 1.24 格宽，hitbox 不包含围巾外沿。 */
+    public static final float WIDTH = 0.9F;
+    public static final float HEIGHT = 1.7F;
 
     public static final double BASE_MAX_HEALTH = 16.0D;
     public static final double BASE_MOVEMENT_SPEED = 0.25D;
@@ -52,7 +52,8 @@ public final class PinkScarfProfile {
     /** 每次繁殖只产一个幼体，避免一块栾栾块批量生成过多实体。 */
     public static final int EGGS_PER_BREEDING = 1;
     public static final int HATCH_CHANCE_INV = 500;
-    public static final int AMBIENT_INTERVAL = 6000;
+    /** 环境音最长约 9.24 秒；12 秒尝试间隔可避免同一实体自我重叠。 */
+    public static final int AMBIENT_INTERVAL = 240;
     public static final float FOOD_HEAL_AMOUNT = 4.0F;
 
     public static final List<String> FOOD_LIKED = List.of(
@@ -71,16 +72,20 @@ public final class PinkScarfProfile {
     public static final int RETALIATION_MEMORY_TICKS = 1200;
     public static final int ATTACK_DECLARE_TICKS = 40;
     public static final int BURST_SHOTS = 6;
-    public static final int BURST_INTERVAL_TICKS = 10;
+    /** 单发音频约 0.62 秒；14 tick（0.70 秒）让每发声音基本完整后再进入下一发。 */
+    public static final int BURST_INTERVAL_TICKS = 14;
     public static final int BURST_COOLDOWN_TICKS = 60;
     public static final float RETALIATION_RANGE = 16.0F;
     public static final double RETALIATION_GOAL_SPEED = 1.25D;
     public static final double PROJECTILE_DAMAGE = 1.0D;
     public static final float PROJECTILE_SPEED = 1.6F;
     /** 远程反击的轻微散射角，保证连射仍然有命中反馈。 */
-    public static final float PROJECTILE_INACCURACY = 3.0F;
-    public static final double PROJECTILE_TARGET_EYE_OFFSET = 1.1D;
-    public static final double PROJECTILE_MUZZLE_HEIGHT_RATIO = 0.25D;
+    /** 保留轻微散射；3.0F 会让远程链明显偏离目标。 */
+    public static final float PROJECTILE_INACCURACY = 0.35F;
+    /** 统一瞄准目标身体中心，避免固定眼高偏移导致打到脚边。 */
+    public static final double PROJECTILE_TARGET_HEIGHT_RATIO = 0.5D;
+    /** 发射口位于实体主体中段，而不是 hitbox 底部。 */
+    public static final double PROJECTILE_MUZZLE_HEIGHT_RATIO = 0.55D;
     public static final double PROJECTILE_FRONT_OFFSET = 0.12D;
 
     /** 这些事件只用于客户端动作反馈，服务端行为不依赖事件本身。 */

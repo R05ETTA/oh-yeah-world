@@ -28,6 +28,23 @@ public final class ClientSoundManager {
     private static final Map<Integer, ActiveSound> ACTIVE_SOUNDS = new HashMap<>();
     private static final Map<Integer, Set<SoundInstance>> OVERLAY_SOUNDS = new HashMap<>();
 
+    /** 最长环境音约 9.24 秒，环境声槽位保留 10 秒全局间隔。 */
+    private static final long AMBIENT_GLOBAL_COOLDOWN_TICKS = 200L;
+    private static long lastAmbientStartTick = Long.MIN_VALUE;
+
+    /** 声音优先级按音频长度和交互重要性分层，避免长受伤音压住攻击链。 */
+    public static final int PRIORITY_AMBIENT = 10;
+    public static final int PRIORITY_HURT = 25;
+    public static final int PRIORITY_ATTACK_DECLARE = 35;
+    public static final int PRIORITY_GROW_UP = 40;
+    public static final int PRIORITY_EAT = 60;
+    public static final int PRIORITY_EAT_FAVORITE = 65;
+    public static final int PRIORITY_ATTACK_SHOT = 70;
+    public static final int PRIORITY_BREED_SUCCESS = 70;
+    public static final int PRIORITY_ATTACK_END = 80;
+    public static final int PRIORITY_SHEAR = 90;
+    public static final int PRIORITY_DEATH = 100;
+
     /** 每一帧清理已经播放完毕的物种声音。 */
     public static void update() {
         Minecraft mc = Minecraft.getInstance();
@@ -62,7 +79,27 @@ public final class ClientSoundManager {
         if (interval <= 0 || entity.tickCount % interval != 0 || entity.getRandom().nextInt(3) != 0) {
             return;
         }
-        playAction(entity, sound, SoundSource.NEUTRAL, 10, false);
+
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || isSilenced(entity)) {
+            return;
+        }
+
+        long gameTime = mc.level.getGameTime();
+        if (lastAmbientStartTick != Long.MIN_VALUE
+                && gameTime - lastAmbientStartTick < AMBIENT_GLOBAL_COOLDOWN_TICKS) {
+            return;
+        }
+
+        ActiveSound active = ACTIVE_SOUNDS.get(entity.getId());
+        if (active != null
+                && mc.getSoundManager().isActive(active.instance())
+                && active.priority() > PRIORITY_AMBIENT) {
+            return;
+        }
+
+        lastAmbientStartTick = gameTime;
+        playAction(entity, sound, SoundSource.NEUTRAL, PRIORITY_AMBIENT, false);
     }
 
     /** 播放普通物种动作音。 */
@@ -152,6 +189,7 @@ public final class ClientSoundManager {
         }
         ACTIVE_SOUNDS.clear();
         OVERLAY_SOUNDS.clear();
+        lastAmbientStartTick = Long.MIN_VALUE;
     }
 
     private static boolean isSilenced(LivingEntity entity) {

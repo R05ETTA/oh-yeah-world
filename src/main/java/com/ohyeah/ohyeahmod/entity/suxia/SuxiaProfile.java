@@ -19,7 +19,8 @@ public final class SuxiaProfile {
     public static final int SPAWN_MAX_GROUP = 2;
     public static final List<String> DEFAULT_SPAWN_BIOMES = List.of("#minecraft:is_ocean", "#minecraft:is_river");
 
-    public static final int AMBIENT_INTERVAL = 6000;
+    /** 原版鱿鱼环境音为短音频；6 秒尝试间隔避免刷音。 */
+    public static final int AMBIENT_INTERVAL = 120;
 
     public static final byte EVENT_HURT = 60;
     public static final byte EVENT_DEATH = 61;

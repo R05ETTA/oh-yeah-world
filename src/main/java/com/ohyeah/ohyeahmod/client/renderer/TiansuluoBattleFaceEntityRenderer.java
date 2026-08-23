@@ -26,7 +26,7 @@ public class TiansuluoBattleFaceEntityRenderer extends MobRenderer<TiansuluoBatt
     protected void setupRotations(TiansuluoBattleFaceEntity entity, PoseStack poseStack, float bob, float yBodyRot, float partialTick, float scale) {
         super.setupRotations(entity, poseStack, bob, yBodyRot, partialTick, scale);
         poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
-        float renderScale = 0.6F;
+        float renderScale = 0.35F;
         if (entity.isBaby()) {
             renderScale *= BattleFaceProfile.BABY_SCALE_FACTOR;
         }

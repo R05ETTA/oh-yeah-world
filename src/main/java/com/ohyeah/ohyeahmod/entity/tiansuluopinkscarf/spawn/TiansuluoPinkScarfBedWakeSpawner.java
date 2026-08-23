@@ -1,5 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.spawn;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.TiansuluoPinkScarfEntity;
 import com.ohyeah.ohyeahmod.entity.logic.SleepWakeSpeciesHandler;
@@ -60,6 +62,9 @@ public final class TiansuluoPinkScarfBedWakeSpawner implements SleepWakeSpeciesH
 
         if (adult != null) world.addFreshEntity(adult);
         if (baby != null) world.addFreshEntity(baby);
+        if (adult != null && baby != null) {
+            ModAdvancementTracker.award(player, ModAdvancementIds.BEDSIDE_PAIR);
+        }
     }
 
     private static @Nullable TiansuluoPinkScarfEntity createEntity(ServerLevel world, BlockPos pos, boolean baby) {

@@ -17,6 +17,11 @@ public abstract class ModLangProvider extends LanguageProvider {
         super(output, OhYeah.MODID, locale);
     }
 
+    protected void addAdvancement(String id, String title, String description) {
+        add("advancements." + OhYeah.MODID + "." + id + ".title", title);
+        add("advancements." + OhYeah.MODID + "." + id + ".description", description);
+    }
+
     /**
      * 英文翻译
      */
@@ -100,6 +105,21 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.suxia.hurt", "Suxia is hurt");
             add("subtitles.ohyeah.suxia.death", "Suxia dies");
             add("subtitles.ohyeah.suxia.squirt", "Suxia sprays ink");
+
+            addAdvancement("root", "Oh Yeah! World", "Meet the creatures of a new little world.");
+            addAdvancement("meet_scarf_luo", "Meet Scarf Luo", "Encounter a Tiansuluo Subspecies: Scarf Luo.");
+            addAdvancement("meet_battle_face", "Meet Battle Face", "Encounter a Tiansuluo Subspecies: Battle Face.");
+            addAdvancement("meet_suxia", "Meet Suxia", "Encounter the quiet aquatic Suxia.");
+            addAdvancement("feed_grow", "Growing Together", "Feed a young Tiansuluo.");
+            addAdvancement("tame_scarf_luo", "A New Companion", "Tame a Scarf Luo.");
+            addAdvancement("tame_battle_face", "A Fierce Companion", "Tame a Battle Face.");
+            addAdvancement("owner_combat", "Fight Together", "Let a tamed Tiansuluo join your attack.");
+            addAdvancement("shear", "A Little Wool", "Shear a tamed Tiansuluo.");
+            addAdvancement("restore_voice", "Give Back Its Voice", "Feed a silenced Tiansuluo.");
+            addAdvancement("breed_tiansuluo", "Luanluan Begins", "Breed two tamed Tiansuluo.");
+            addAdvancement("hatch_luanluan", "A New Luanluan", "Hatch a Luanluan Block.");
+            addAdvancement("bedside_pair", "A Bedside Surprise", "Wake up to a grown and young Scarf Luo.");
+            addAdvancement("collect_species", "Oh Yeah! World Complete", "Meet all three creatures.");
         }
     }
 
@@ -186,6 +206,21 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.suxia.hurt", "素虾受伤了");
             add("subtitles.ohyeah.suxia.death", "素虾倒下了");
             add("subtitles.ohyeah.suxia.squirt", "素虾喷出墨汁");
+
+            addAdvancement("root", "欧耶世界", "认识这个略略的世界里的生物。");
+            addAdvancement("meet_scarf_luo", "遇见围巾罗", "遇见天素罗亚种·围巾罗。");
+            addAdvancement("meet_battle_face", "遇见战斗脸", "遇见天素罗亚种·战斗脸。");
+            addAdvancement("meet_suxia", "遇见素虾", "遇见安静的素虾。");
+            addAdvancement("feed_grow", "一起长大", "喂养一只幼年天素罗。");
+            addAdvancement("tame_scarf_luo", "新的伙伴", "驯服一只围巾罗。");
+            addAdvancement("tame_battle_face", "勇敢的伙伴", "驯服一只战斗脸。");
+            addAdvancement("owner_combat", "并肩作战", "让已驯服的天素罗加入你的战斗。");
+            addAdvancement("shear", "一点羊毛", "用剪刀剪下天素罗的红羊毛。");
+            addAdvancement("restore_voice", "找回声音", "喂食一只被禁声的天素罗。");
+            addAdvancement("breed_tiansuluo", "栾栾的开始", "让两只已驯服的天素罗繁殖。");
+            addAdvancement("hatch_luanluan", "新的栾栾", "孵化一块栾栾块。");
+            addAdvancement("bedside_pair", "床边的新客人", "醒来时发现床边出现一大一小两只围巾罗。");
+            addAdvancement("collect_species", "欧耶世界完成", "遇见全部三种生物。");
         }
     }
 }

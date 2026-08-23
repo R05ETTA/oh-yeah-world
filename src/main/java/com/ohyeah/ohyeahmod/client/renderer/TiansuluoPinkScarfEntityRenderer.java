@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 
 /** 粉围巾模型的原生 MobRenderer 缩放/朝向实现。 */
 public class TiansuluoPinkScarfEntityRenderer extends MobRenderer<TiansuluoPinkScarfEntity, TiansuluoPinkScarfEntityModel> {
+    private static final float MODEL_SCALE = 0.60F;
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(
             OhYeah.MODID,
             "textures/entity/tiansuluo_pink_scarf.png"
@@ -29,6 +30,7 @@ public class TiansuluoPinkScarfEntityRenderer extends MobRenderer<TiansuluoPinkS
     protected void scale(TiansuluoPinkScarfEntity entity, PoseStack poseStack, float partialTick) {
         super.scale(entity, poseStack, partialTick);
         poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
+        poseStack.scale(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
         if (entity.isBaby()) {
             poseStack.scale(0.55F, 0.55F, 0.55F);
         }

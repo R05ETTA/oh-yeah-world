@@ -1,5 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.suxia;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -141,6 +143,7 @@ public class SuxiaEntity extends WaterAnimal {
         if (this.level().isClientSide) {
             this.feedback.tickClient(this);
         }
+        ModAdvancementTracker.checkEncounter(this, ModAdvancementIds.MEET_SUXIA, "suxia");
 
         this.prevTentacleAngle = this.tentacleAngle;
         this.prevSwimProgress = this.swimProgress;

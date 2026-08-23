@@ -1,5 +1,8 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 
@@ -23,6 +26,9 @@ public final class PinkScarfOwnerHurtTargetGoal extends OwnerHurtTargetGoal {
         LivingEntity target = this.pinkScarf.getTarget();
         if (target != null) {
             this.pinkScarf.beginRetaliation(target);
+            if (this.pinkScarf.getOwner() instanceof ServerPlayer owner) {
+                ModAdvancementTracker.award(owner, ModAdvancementIds.OWNER_COMBAT);
+            }
         }
     }
 }

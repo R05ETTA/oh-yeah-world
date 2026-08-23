@@ -1,5 +1,8 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 
@@ -23,6 +26,9 @@ public final class BattleFaceOwnerHurtTargetGoal extends OwnerHurtTargetGoal {
         LivingEntity target = this.battleFace.getTarget();
         if (target != null) {
             this.battleFace.beginOwnerRetaliation(target);
+            if (this.battleFace.getOwner() instanceof ServerPlayer owner) {
+                ModAdvancementTracker.award(owner, ModAdvancementIds.OWNER_COMBAT);
+            }
         }
     }
 }

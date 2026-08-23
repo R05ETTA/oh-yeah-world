@@ -102,7 +102,9 @@ public final class BattleFacePounceAttack extends Goal {
     }
 
     private void launchAt(LivingEntity target) {
-        Vec3 aimPoint = target.position().add(0, target.getBbHeight() * 0.5D, 0);
+        Vec3 targetLead = new Vec3(target.getDeltaMovement().x, 0.0D, target.getDeltaMovement().z)
+                .scale(BattleFaceProfile.POUNCE_TARGET_LEAD_TICKS);
+        Vec3 aimPoint = target.position().add(targetLead).add(0, target.getBbHeight() * 0.5D, 0);
         Vec3 origin = this.entity.getBoundingBox().getCenter();
         Vec3 delta = aimPoint.subtract(origin);
         Vec3 horizontal = new Vec3(delta.x, 0.0D, delta.z);
@@ -113,11 +115,11 @@ public final class BattleFacePounceAttack extends Goal {
                 0.6D,
                 BattleFaceProfile.POUNCE_HORIZONTAL_SPEED
         );
-        double verticalOffset = Mth.clamp(delta.y * 0.25D, -0.18D, 0.3D);
+        double verticalOffset = Mth.clamp(delta.y * 0.15D, -0.08D, 0.16D);
         double verticalSpeed = Mth.clamp(
                 BattleFaceProfile.POUNCE_VERTICAL_SPEED + verticalOffset,
-                0.24D,
-                0.95D
+                0.25D,
+                0.65D
         );
 
         this.entity.setDeltaMovement(
@@ -131,8 +133,10 @@ public final class BattleFacePounceAttack extends Goal {
 
     private boolean tryResolveHit(LivingEntity target) {
         double padding = BattleFaceProfile.POUNCE_HITBOX_PADDING;
-        AABB hitBox = this.entity.getBoundingBox().inflate(padding);
-        if (!hitBox.intersects(target.getBoundingBox().inflate(padding))) {
+        AABB targetHitBox = target.getBoundingBox().inflate(padding);
+        AABB currentHitBox = this.entity.getBoundingBox().inflate(padding);
+        AABB nextHitBox = currentHitBox.move(this.entity.getDeltaMovement());
+        if (!currentHitBox.intersects(targetHitBox) && !nextHitBox.intersects(targetHitBox)) {
             return false;
         }
 
@@ -144,9 +148,17 @@ public final class BattleFacePounceAttack extends Goal {
     private void finishAttempt() {
         if (this.resolved) return;
         this.resolved = true;
-        this.entity.state().setRetaliationTicksRemaining(0);
+        // 野生战颜保留有效仇恨并在冷却后继续扑击；驯化战颜只完成这一轮。
+        boolean continueRetaliation = !this.entity.isTame()
+                && this.entity.getTarget() != null
+                && this.entity.getTarget().isAlive();
+        this.entity.state().setRetaliationTicksRemaining(
+                continueRetaliation ? BattleFaceProfile.RETALIATION_MEMORY_TICKS : 0
+        );
         this.entity.state().setPounceCooldownTicks(BattleFaceProfile.POUNCE_COOLDOWN);
-        this.entity.setTarget(null);
+        if (!continueRetaliation) {
+            this.entity.setTarget(null);
+        }
         this.entity.level().broadcastEntityEvent(this.entity, BattleFaceProfile.EVENT_ATTACK_END);
     }
 

@@ -1,5 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.registry.ModEntityTypes;
 import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.core.BlockPos;
@@ -8,6 +10,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -104,6 +107,7 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
             CLIENT_FEEDBACK.tickClient(this);
             return;
         }
+        ModAdvancementTracker.checkEncounter(this, ModAdvancementIds.MEET_SCARF_LUO, "scarf_luo");
 
         this.tickRetaliationWindow();
         if (this.wasBabyLastTick && !this.isBaby()) {
@@ -134,7 +138,7 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
 
         Vec3Muzzle muzzle = this.getProjectileMuzzle();
         double deltaX = target.getX() - muzzle.x;
-        double deltaY = target.getEyeY() - PinkScarfProfile.PROJECTILE_TARGET_EYE_OFFSET - muzzle.y;
+        double deltaY = target.getY() + target.getBbHeight() * PinkScarfProfile.PROJECTILE_TARGET_HEIGHT_RATIO - muzzle.y;
         double deltaZ = target.getZ() - muzzle.z;
         double arcBoost = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ) * 0.2D;
 
@@ -207,9 +211,13 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
                 return InteractionResult.CONSUME;
             }
 
+            boolean wasSilenced = this.state.isSilenced(this);
             this.usePlayerItem(player, hand, stack);
             this.tryToTame(player);
             this.state.setSilenced(this, false);
+            if (wasSilenced) {
+                this.awardAdvancement(player, ModAdvancementIds.RESTORE_VOICE);
+            }
             this.playFoodFeedback(true);
             return InteractionResult.SUCCESS;
         }
@@ -221,6 +229,7 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
             }
 
             boolean wasBaby = this.isBaby();
+            boolean wasSilenced = this.state.isSilenced(this);
             this.usePlayerItem(player, hand, stack);
             if (favorite) {
                 this.setAge(0);
@@ -228,6 +237,10 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
                 this.ageUp(PinkScarfProfile.LIKED_FOOD_GROWTH_TICKS / 20, true);
             }
             this.state.setSilenced(this, false);
+            this.awardAdvancement(player, ModAdvancementIds.FEED_GROW);
+            if (wasSilenced) {
+                this.awardAdvancement(player, ModAdvancementIds.RESTORE_VOICE);
+            }
             if (wasBaby && !this.isBaby()) {
                 this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_GROW_UP);
                 this.wasBabyLastTick = false;
@@ -242,11 +255,15 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
                 return InteractionResult.CONSUME;
             }
 
+            boolean wasSilenced = this.state.isSilenced(this);
             this.usePlayerItem(player, hand, stack);
             this.heal(PinkScarfProfile.FOODS.isFavorite(stack)
                     ? PinkScarfProfile.FOOD_HEAL_AMOUNT
                     : PinkScarfProfile.FOOD_HEAL_AMOUNT * 0.5F);
             this.state.setSilenced(this, false);
+            if (wasSilenced) {
+                this.awardAdvancement(player, ModAdvancementIds.RESTORE_VOICE);
+            }
             this.playFoodFeedback(favorite);
             return InteractionResult.SUCCESS;
         }
@@ -255,9 +272,13 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         }
 
         /* Animal.mobInteract 负责成年求偶，避免手写 love 计时器。 */
+        boolean wasSilenced = this.state.isSilenced(this);
         InteractionResult result = super.mobInteract(player, hand);
         if (result.consumesAction() && this.isFood(stack) && !this.level().isClientSide) {
             this.state.setSilenced(this, false);
+            if (wasSilenced) {
+                this.awardAdvancement(player, ModAdvancementIds.RESTORE_VOICE);
+            }
             this.playFoodFeedback(favorite);
         }
         return result;
@@ -266,6 +287,9 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
     private void tryToTame(Player player) {
         if (this.getRandom().nextInt(3) == 0 && !EventHooks.onAnimalTame(this, player)) {
             this.tame(player);
+            if (player instanceof ServerPlayer serverPlayer) {
+                ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.TAME_SCARF_LUO);
+            }
             this.getNavigation().stop();
             this.setTarget(null);
             this.level().broadcastEntityEvent(this, (byte) 7);
@@ -276,6 +300,12 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
 
     private void playFoodFeedback(boolean favorite) {
         this.level().broadcastEntityEvent(this, favorite ? PinkScarfProfile.EVENT_EAT_FAVORITE : PinkScarfProfile.EVENT_EAT);
+    }
+
+    private void awardAdvancement(Player player, String advancementId) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            ModAdvancementTracker.award(serverPlayer, advancementId);
+        }
     }
 
     @Override
@@ -324,6 +354,7 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
             level.playSound(null, this, net.minecraft.sounds.SoundEvents.SHEEP_SHEAR, SoundSource.PLAYERS, 1.0F, 1.0F);
             this.state.setSilenced(this, true);
             level.broadcastEntityEvent(this, PinkScarfProfile.EVENT_SHEAR_REACT);
+            this.awardAdvancement(player, ModAdvancementIds.SHEAR);
         }
         return List.of(new ItemStack(Items.RED_WOOL));
     }

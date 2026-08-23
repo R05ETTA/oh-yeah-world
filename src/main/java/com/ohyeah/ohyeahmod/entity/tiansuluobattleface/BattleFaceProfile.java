@@ -23,7 +23,8 @@ public final class BattleFaceProfile {
     public static final float BABY_SCALE_FACTOR = 0.5F;
 
     public static final int HATCH_CHANCE_INV = 500;
-    public static final int AMBIENT_INTERVAL = 6000;
+    /** 环境音最长约 3.48 秒；6 秒尝试间隔保留播放余量。 */
+    public static final int AMBIENT_INTERVAL = 120;
     /** 原生 Animal 繁殖后的父母冷却时间。 */
     public static final int PARENT_BREEDING_COOLDOWN_TICKS = 6000;
     public static final int FOOD_GROWTH_STEP = 6000;
@@ -49,19 +50,23 @@ public final class BattleFaceProfile {
     public static final int RETALIATION_DECLARE_TICKS = 40;
     /** 反击总时长。 */
     public static final int RETALIATION_TOTAL_TICKS = 100;
+    /** 野生战颜每轮扑击后保留仇恨的时间；驯化战颜不使用连续模式。 */
+    public static final int RETALIATION_MEMORY_TICKS = 1200;
 
     /** 飞扑水平最大初速度。 */
     public static final double POUNCE_HORIZONTAL_SPEED = 1.3D;
-    /** 飞扑垂直初速度。 */
-    public static final double POUNCE_VERTICAL_SPEED = 1.15D;
+    /** 目标身体中心的低跃扑击初速度，避免 0.95 格以上的高抛。 */
+    public static final double POUNCE_VERTICAL_SPEED = 0.45D;
     /** 飞扑最长飞行刻。 */
     public static final int POUNCE_MAX_FLIGHT_TICKS = 12;
     /** 受击后最多保留该距离内的攻击目标。 */
     public static final double RETALIATION_MAX_RANGE_SQUARED = 24.0D * 24.0D;
     /** 进入实际扑击的近身范围平方（4 格）。 */
     public static final double POUNCE_WINDOW_SQUARED = 16.0D;
-    /** 飞扑碰撞箱边距补偿。 */
-    public static final double POUNCE_HITBOX_PADDING = 0.2D;
+    /** 预测目标两 tick 的水平位移，降低目标移动造成的扑空。 */
+    public static final double POUNCE_TARGET_LEAD_TICKS = 2.0D;
+    /** hitbox 现在与模型主体匹配，保留 0.30 格碰撞余量。 */
+    public static final double POUNCE_HITBOX_PADDING = 0.3D;
     /** 进入攻击宣告动作。 */
     public static final byte EVENT_ATTACK_DECLARE = 60;
     /** 幼体成长为成体。 */
