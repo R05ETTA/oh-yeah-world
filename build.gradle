@@ -23,7 +23,7 @@ sourceSets.main.resources {
 
     // Exclude common development only resources from finalized outputs
     exclude("**/*.bbmodel") // BlockBench project files
-    exclude("src/generated/**/.cache") // datagen cache files
+    exclude("**/.cache/**") // datagen cache files
 }
 
 repositories {
@@ -168,6 +168,117 @@ sourceSets.main.resources.srcDir generateModMetadata
 // To avoid having to run "generateModMetadata" manually, make it run on every project reload
 neoForge.ideSyncTask generateModMetadata
 
+var cleanDatagenCache = tasks.register("cleanDatagenCache", Delete) {
+    delete(layout.projectDirectory.dir("src/generated/resources/.cache"))
+}
+
+tasks.named("runData") {
+    dependsOn cleanDatagenCache
+}
+
+// Package entry points must never rely on a developer having run datagen manually.
+// runData already depends on classes/processResources, so copy its fresh outputs into
+// the processed-resources directory afterwards instead of creating a dependency cycle.
+var prepareGeneratedResourcesForPackaging = tasks.register("prepareGeneratedResourcesForPackaging", Copy) {
+    dependsOn tasks.named("runData")
+    from("src/generated/resources") {
+        exclude("**/.cache/**")
+    }
+    into(layout.buildDirectory.dir("resources/main"))
+}
+
+tasks.named("jar") {
+    dependsOn prepareGeneratedResourcesForPackaging
+}
+
+// When packaging and GameTests share one Gradle invocation, consume the refreshed
+// resource directory only after the packaging copy has completed.
+tasks.named("runGameTestServer") {
+    mustRunAfter prepareGeneratedResourcesForPackaging
+    mustRunAfter tasks.named("build")
+}
+
+var modJar = tasks.named("jar", Jar).flatMap { it.archiveFile }
+var requiredJarResources = [
+        "assets/ohyeah/sounds.json",
+        "assets/ohyeah/sounds/entity/tiansuluo/notice_player_01.ogg",
+        "assets/ohyeah/lang/en_us.json",
+        "assets/ohyeah/lang/zh_cn.json",
+        "assets/ohyeah/blockstates/tiansuluo_pink_scarf_luanluan_block.json",
+        "data/ohyeah/advancement/root.json",
+        "data/ohyeah/loot_table/entities/suxia.json",
+        "data/ohyeah/neoforge/biome_modifier/suxia_spawn.json",
+        "data/ohyeah/structure/empty.nbt",
+]
+
+var verifyJarResources = tasks.register("verifyJarResources") {
+    dependsOn tasks.named("jar")
+    inputs.file(modJar)
+
+    doLast {
+        var missing = []
+        new java.util.zip.ZipFile(modJar.get().asFile).withCloseable { zip ->
+            requiredJarResources.each { path ->
+                if (zip.getEntry(path) == null) {
+                    missing.add(path)
+                }
+            }
+            if (zip.stream().anyMatch { entry -> entry.name.startsWith(".cache/") }) {
+                throw new GradleException("Datagen cache files must not be packaged in the mod JAR")
+            }
+        }
+        if (!missing.isEmpty()) {
+            throw new GradleException("Missing required generated resources: ${missing.join(', ')}")
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn verifyJarResources
+}
+
+var configuredModVersion = mod_version.toString()
+var releaseTag = providers.environmentVariable("GITHUB_REF_NAME").orElse("")
+
+var verifyReleaseMetadata = tasks.register("verifyReleaseMetadata") {
+    group = "verification"
+    description = "Validates the configured mod version and, in CI, the release tag."
+    inputs.property("modVersion", configuredModVersion)
+    inputs.property("releaseTag", releaseTag)
+
+    doLast {
+        if (!(configuredModVersion ==~ /\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?/)) {
+            throw new GradleException("mod_version must be a semantic version, got '${configuredModVersion}'")
+        }
+        var currentTag = releaseTag.get()
+        var expectedTag = "v${configuredModVersion}"
+        if (!currentTag.isEmpty() && currentTag != expectedTag) {
+            throw new GradleException("Release tag '${currentTag}' must match '${expectedTag}'")
+        }
+    }
+}
+
+tasks.named("build") {
+    mustRunAfter verifyReleaseMetadata
+}
+tasks.named("runGameTestServer") {
+    mustRunAfter verifyReleaseMetadata
+}
+
+var ciCheck = tasks.register("ciCheck") {
+    group = "verification"
+    description = "Builds the mod, verifies packaged resources, and runs all GameTests."
+    dependsOn tasks.named("build")
+    dependsOn tasks.named("runGameTestServer")
+}
+
+tasks.register("releaseCheck") {
+    group = "verification"
+    description = "Runs every validation required before publishing a release."
+    dependsOn verifyReleaseMetadata
+    dependsOn ciCheck
+}
+
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {
     publications {
@@ -177,7 +288,7 @@ publishing {
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            url = uri("${project.projectDir}/repo")
         }
     }
 }

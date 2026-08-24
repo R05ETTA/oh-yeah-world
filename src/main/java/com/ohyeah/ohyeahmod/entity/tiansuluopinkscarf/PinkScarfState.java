@@ -3,10 +3,7 @@ package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.UUID;
 
 /**
  * 粉围巾真正需要跨客户端/存档保存的状态。
@@ -21,11 +18,11 @@ public final class PinkScarfState {
     private static final String TAG_EGG_BLOCK_TARGET_Y = "LuanluanBlockTargetY";
     private static final String TAG_EGG_BLOCK_TARGET_Z = "LuanluanBlockTargetZ";
     private static final String TAG_EGG_BLOCK_PLACING_COUNTER = "LuanluanBlockPlacingCounter";
-    private static final String TAG_EGG_BLOCK_PLAYER_UUID = "LuanluanBlockPlayerUuid";
+    private static final String TAG_NOTICED_PLAYER = "NoticedPlayer";
 
     private @Nullable BlockPos eggBlockTargetPos;
     private int eggBlockPlacingCounter;
-    private @Nullable UUID eggBlockPlayerUuid;
+    private boolean noticedPlayer;
 
     public static void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(TiansuluoPinkScarfEntity.HAS_CARRIED_EGG_BLOCK, false);
@@ -41,9 +38,7 @@ public final class PinkScarfState {
             nbt.putInt(TAG_EGG_BLOCK_TARGET_Z, this.eggBlockTargetPos.getZ());
         }
         nbt.putInt(TAG_EGG_BLOCK_PLACING_COUNTER, this.eggBlockPlacingCounter);
-        if (this.eggBlockPlayerUuid != null) {
-            nbt.putUUID(TAG_EGG_BLOCK_PLAYER_UUID, this.eggBlockPlayerUuid);
-        }
+        nbt.putBoolean(TAG_NOTICED_PLAYER, this.noticedPlayer);
     }
 
     public void readAdditionalSaveData(TiansuluoPinkScarfEntity entity, CompoundTag nbt) {
@@ -58,9 +53,7 @@ public final class PinkScarfState {
             );
         }
         this.eggBlockPlacingCounter = carrying ? Math.max(0, nbt.getInt(TAG_EGG_BLOCK_PLACING_COUNTER)) : 0;
-        this.eggBlockPlayerUuid = carrying && nbt.hasUUID(TAG_EGG_BLOCK_PLAYER_UUID)
-                ? nbt.getUUID(TAG_EGG_BLOCK_PLAYER_UUID)
-                : null;
+        this.noticedPlayer = nbt.getBoolean(TAG_NOTICED_PLAYER);
     }
     public void setSilenced(TiansuluoPinkScarfEntity entity, boolean silenced) {
         entity.getEntityData().set(TiansuluoPinkScarfEntity.IS_SILENCED, silenced);
@@ -79,7 +72,6 @@ public final class PinkScarfState {
         if (!carrying) {
             this.eggBlockTargetPos = null;
             this.eggBlockPlacingCounter = 0;
-            this.eggBlockPlayerUuid = null;
         }
     }
 
@@ -98,16 +90,11 @@ public final class PinkScarfState {
     public void setEggBlockPlacingCounter(int counter) {
         this.eggBlockPlacingCounter = Math.max(0, counter);
     }
-
-    public @Nullable UUID getEggBlockPlayerUuid() {
-        return this.eggBlockPlayerUuid;
+    public boolean hasNoticedPlayer() {
+        return this.noticedPlayer;
     }
 
-    public void setEggBlockPlayerUuid(@Nullable UUID playerUuid) {
-        this.eggBlockPlayerUuid = playerUuid;
-    }
-
-    public void setEggBlockAttractedPlayer(@Nullable Player player) {
-        this.eggBlockPlayerUuid = player == null ? null : player.getUUID();
+    public void setNoticedPlayer(boolean noticedPlayer) {
+        this.noticedPlayer = noticedPlayer;
     }
 }

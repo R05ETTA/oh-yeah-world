@@ -40,26 +40,72 @@ public final class LuanluanEggBlock extends Block {
     }
 
     @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
-        if (!this.shouldHatch(level)) return;
-
-        int hatch = state.getValue(HATCH);
-        if (hatch < 2) {
-            level.setBlock(pos, state.setValue(HATCH, hatch + 1), 2);
-        } else {
-            this.hatch(level, pos, state);
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+        if (!level.isClientSide && oldState.getBlock() != this) {
+            this.scheduleNextHatch((ServerLevel) level, pos);
         }
     }
 
-    private void hatch(ServerLevel level, BlockPos pos, BlockState state) {
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        if (level.getBlockState(pos).getBlock() != this) {
+            return;
+        }
+        this.advanceHatch(level, pos, state, random);
+    }
+
+    /**
+     * 旧存档中的方块可能没有保存计划刻；随机刻只负责重新安排定时孵化，避免继续依赖极低概率。
+     */
+    @Override
+    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        this.scheduleNextHatch(level, pos);
+    }
+
+    private void scheduleNextHatch(ServerLevel level, BlockPos pos) {
+        level.scheduleTick(pos, this, this.hatchIntervalTicks());
+    }
+
+    private int hatchIntervalTicks() {
+        if (PinkScarfProfile.SPECIES_ID.equals(this.speciesId)) {
+            return PinkScarfProfile.HATCH_INTERVAL_TICKS;
+        }
+        return BattleFaceProfile.HATCH_INTERVAL_TICKS;
+    }
+
+    private void advanceHatch(ServerLevel level, BlockPos pos, BlockState state, net.minecraft.util.RandomSource random) {
+        int hatch = state.getValue(HATCH);
+        if (hatch < 2) {
+            BlockState nextState = state.setValue(HATCH, hatch + 1);
+            level.setBlock(pos, nextState, Block.UPDATE_ALL);
+            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.TURTLE_EGG_CRACK,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 0.7F, 0.9F + random.nextFloat() * 0.2F);
+            level.gameEvent(net.minecraft.world.level.gameevent.GameEvent.BLOCK_CHANGE, pos,
+                    net.minecraft.world.level.gameevent.GameEvent.Context.of(nextState));
+            this.scheduleNextHatch(level, pos);
+            return;
+        }
+
+        this.hatch(level, pos, state, random);
+    }
+
+    private void hatch(ServerLevel level, BlockPos pos, BlockState state, net.minecraft.util.RandomSource random) {
         int eggs = state.getValue(EGGS);
-        int hatchedCount = 0;
+        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.TURTLE_EGG_HATCH,
+                net.minecraft.sounds.SoundSource.BLOCKS, 0.7F, 0.9F + random.nextFloat() * 0.2F);
         level.removeBlock(pos, false);
+        level.gameEvent(net.minecraft.world.level.gameevent.GameEvent.BLOCK_DESTROY, pos,
+                net.minecraft.world.level.gameevent.GameEvent.Context.of(state));
+        level.levelEvent(2001, pos, Block.getId(state));
+
+        int hatchedCount = 0;
         for (int i = 0; i < eggs; i++) {
             var entity = this.entityTypeSupplier.get().create(level);
             if (entity instanceof AgeableMob ageable) {
                 ageable.setAge(AgeableMob.BABY_START_AGE);
-                ageable.moveTo(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, level.random.nextFloat() * 360.0F, 0.0F);
+                ageable.moveTo(pos.getX() + 0.3D + i * 0.2D, pos.getY(), pos.getZ() + 0.3D,
+                        random.nextFloat() * 360.0F, 0.0F);
                 level.addFreshEntity(ageable);
                 hatchedCount++;
             }
@@ -67,19 +113,6 @@ public final class LuanluanEggBlock extends Block {
         if (hatchedCount > 0) {
             ModAdvancementTracker.awardNearby(level, pos, ModAdvancementIds.HATCH_LUANLUAN);
         }
-    }
-
-    private boolean shouldHatch(Level level) {
-        int chanceInv = 500;
-        if (PinkScarfProfile.SPECIES_ID.equals(this.speciesId)) {
-            chanceInv = PinkScarfProfile.HATCH_CHANCE_INV;
-        } else if (BattleFaceProfile.SPECIES_ID.equals(this.speciesId)) {
-            chanceInv = BattleFaceProfile.HATCH_CHANCE_INV;
-        }
-
-        /* 与原版 TurtleEggBlock 一致：夜间窗口稳定推进，其他时间保留随机推进。 */
-        float timeOfDay = level.getTimeOfDay(1.0F);
-        return timeOfDay > 0.65F && timeOfDay < 0.69F || level.random.nextInt(chanceInv) == 0;
     }
 
     @Override

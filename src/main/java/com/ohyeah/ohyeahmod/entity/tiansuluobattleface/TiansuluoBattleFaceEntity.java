@@ -2,6 +2,7 @@ package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
+import com.ohyeah.ohyeahmod.entity.tiansuluo.TiansuluoPlayerNoticeDetector;
 import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -49,6 +50,13 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
         super(entityType, level);
     }
 
+    /** 禁用原版 FollowOwnerGoal 的 12 格自动瞬移，改为只使用寻路跟随。 */
+    @Override
+    public boolean shouldTryTeleportToOwner() {
+        return false;
+    }
+
+
     public static boolean canSpawn(
             EntityType<? extends Animal> type,
             LevelAccessor level,
@@ -94,6 +102,7 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
             return;
         }
         ModAdvancementTracker.checkEncounter(this, ModAdvancementIds.MEET_BATTLE_FACE, "battle_face");
+        this.tickPlayerNotice();
 
         if (this.state.wasBabyLastTick() && !this.isBaby()) {
             this.level().broadcastEntityEvent(this, BattleFaceProfile.EVENT_GROW_UP);
@@ -147,10 +156,33 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
         this.spawnAtLocation(ModItems.CHIPS.get());
         this.spawnAtLocation(ModItems.TIANSULUO_BATTLE_FACE_EGG.get());
     }
+    private void tickPlayerNotice() {
+        if (this.state.hasNoticedPlayer()
+                || this.state.isSilenced(this)
+                || this.tickCount % 5 != 0) {
+            return;
+        }
+        if (TiansuluoPlayerNoticeDetector.seesPlayer(this)) {
+            this.state.setNoticedPlayer(true);
+            this.level().broadcastEntityEvent(this, BattleFaceProfile.EVENT_NOTICE_PLAYER);
+        }
+    }
+
 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+
+        if (this.isTame() && this.isOwnedBy(player) && stack.isEmpty()) {
+            if (!this.level().isClientSide) {
+                boolean sit = !this.isOrderedToSit();
+                this.setOrderedToSit(sit);
+                if (sit) {
+                    this.getNavigation().stop();
+                }
+            }
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
 
         InteractionResult shearResult = this.shear.handleShear(this, player, hand, stack);
         if (shearResult.consumesAction()) {
@@ -159,17 +191,32 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
         }
 
         InteractionResult behaviorResult = this.behavior.handleMobInteract(this, player, hand);
-        if (behaviorResult.consumesAction()) return behaviorResult;
+        if (behaviorResult.consumesAction() || this.isFood(stack)) {
+            return behaviorResult;
+        }
 
         return super.mobInteract(player, hand);
     }
 
     @Override
     public void handleEntityEvent(byte status) {
-        if (this.level().isClientSide) {
-            this.feedback.handleClientEntityEvent(this, status);
+        switch (status) {
+            case BattleFaceProfile.EVENT_ATTACK_DECLARE,
+                    BattleFaceProfile.EVENT_GROW_UP,
+                    BattleFaceProfile.EVENT_SHEAR_REACT,
+                    BattleFaceProfile.EVENT_EAT,
+                    BattleFaceProfile.EVENT_EAT_FAVORITE,
+                    BattleFaceProfile.EVENT_ATTACK_END,
+                    BattleFaceProfile.EVENT_HURT,
+                    BattleFaceProfile.EVENT_DEATH,
+                    BattleFaceProfile.EVENT_BREED_SUCCESS,
+                    BattleFaceProfile.EVENT_NOTICE_PLAYER -> {
+                if (this.level().isClientSide) {
+                    this.feedback.handleClientEntityEvent(this, status);
+                }
+            }
+            default -> super.handleEntityEvent(status);
         }
-        super.handleEntityEvent(status);
     }
 
     @Override

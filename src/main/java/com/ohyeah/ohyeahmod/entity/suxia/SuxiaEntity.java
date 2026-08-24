@@ -186,8 +186,11 @@ public class SuxiaEntity extends WaterAnimal {
 
     @Override
     public void handleEntityEvent(byte status) {
-        if (this.level().isClientSide) {
-            this.feedback.handleClientEntityEvent(this, status);
+        if (status >= SuxiaProfile.EVENT_HURT && status <= SuxiaProfile.EVENT_SQUIRT) {
+            if (this.level().isClientSide) {
+                this.feedback.handleClientEntityEvent(this, status);
+            }
+            return;
         }
         super.handleEntityEvent(status);
     }

@@ -22,7 +22,8 @@ public final class BattleFaceProfile {
     public static final float TARGET_ADULT_HEIGHT = 1.2F;
     public static final float BABY_SCALE_FACTOR = 0.5F;
 
-    public static final int HATCH_CHANCE_INV = 500;
+    /** 每个阶段 10 秒自动推进，三阶段总计约 30 秒。 */
+    public static final int HATCH_INTERVAL_TICKS = 200;
     /** 环境音最长约 3.48 秒；6 秒尝试间隔保留播放余量。 */
     public static final int AMBIENT_INTERVAL = 120;
     /** 原生 Animal 繁殖后的父母冷却时间。 */
@@ -68,23 +69,24 @@ public final class BattleFaceProfile {
     /** hitbox 现在与模型主体匹配，保留 0.30 格碰撞余量。 */
     public static final double POUNCE_HITBOX_PADDING = 0.3D;
     /** 进入攻击宣告动作。 */
-    public static final byte EVENT_ATTACK_DECLARE = 60;
+    public static final byte EVENT_ATTACK_DECLARE = -100;
     /** 幼体成长为成体。 */
-    public static final byte EVENT_GROW_UP = 61;
+    public static final byte EVENT_GROW_UP = -99;
     /** 被剪毛后的反应。 */
-    public static final byte EVENT_SHEAR_REACT = 62;
+    public static final byte EVENT_SHEAR_REACT = -98;
     /** 吃普通喜欢食物。 */
-    public static final byte EVENT_EAT = 63;
+    public static final byte EVENT_EAT = -97;
     /** 吃最喜欢食物。 */
-    public static final byte EVENT_EAT_FAVORITE = 64;
+    public static final byte EVENT_EAT_FAVORITE = -96;
     /** 反击成功结束。 */
-    public static final byte EVENT_ATTACK_END = 66;
+    public static final byte EVENT_ATTACK_END = -95;
     /** 受伤。 */
-    public static final byte EVENT_HURT = 67;
+    public static final byte EVENT_HURT = -94;
     /** 死亡。 */
-    public static final byte EVENT_DEATH = 68;
+    public static final byte EVENT_DEATH = -93;
     /** 繁殖成功。 */
-    public static final byte EVENT_BREED_SUCCESS = 69;
+    public static final byte EVENT_BREED_SUCCESS = -92;
+    public static final byte EVENT_NOTICE_PLAYER = -90;
 
     private static final String CARRIED_MESSAGE_KEY = "message.ohyeah.tiansuluo_battle_face.luanluan_block_carried";
 

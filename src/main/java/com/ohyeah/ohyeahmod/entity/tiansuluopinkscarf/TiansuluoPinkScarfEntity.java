@@ -2,6 +2,7 @@ package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf;
 
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
+import com.ohyeah.ohyeahmod.entity.tiansuluo.TiansuluoPlayerNoticeDetector;
 import com.ohyeah.ohyeahmod.registry.ModEntityTypes;
 import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.core.BlockPos;
@@ -67,6 +68,13 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         this.setTame(false, false);
     }
 
+    /** 禁用原版 FollowOwnerGoal 的 12 格自动瞬移，改为只使用寻路跟随。 */
+    @Override
+    public boolean shouldTryTeleportToOwner() {
+        return false;
+    }
+
+
     public static boolean canSpawn(EntityType<? extends Animal> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
         return Animal.checkAnimalSpawnRules(type, level, spawnType, pos, random);
     }
@@ -108,6 +116,7 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
             return;
         }
         ModAdvancementTracker.checkEncounter(this, ModAdvancementIds.MEET_SCARF_LUO, "scarf_luo");
+        this.tickPlayerNotice();
 
         this.tickRetaliationWindow();
         if (this.wasBabyLastTick && !this.isBaby()) {
@@ -194,8 +203,12 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
 
     @Override
     public void handleEntityEvent(byte status) {
-        if (this.level().isClientSide) {
-            CLIENT_FEEDBACK.handleClientEntityEvent(this, status);
+        if (status >= PinkScarfProfile.EVENT_ATTACK_DECLARE
+                && status <= PinkScarfProfile.EVENT_NOTICE_PLAYER) {
+            if (this.level().isClientSide) {
+                CLIENT_FEEDBACK.handleClientEntityEvent(this, status);
+            }
+            return;
         }
         super.handleEntityEvent(status);
     }
@@ -204,6 +217,17 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         boolean favorite = PinkScarfProfile.FOODS.isFavorite(stack);
+
+        if (this.isTame() && this.isOwnedBy(player) && stack.isEmpty()) {
+            if (!this.level().isClientSide) {
+                boolean sit = !this.isOrderedToSit();
+                this.setOrderedToSit(sit);
+                if (sit) {
+                    this.getNavigation().stop();
+                }
+            }
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
 
         /* 驯服沿用 Cat/Wolf 的交互形态：最爱食物只在未驯服成年体上负责驯服。 */
         if (!this.isTame() && !this.isBaby() && favorite) {
@@ -298,6 +322,18 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         }
     }
 
+    private void tickPlayerNotice() {
+        if (this.state.hasNoticedPlayer()
+                || this.state.isSilenced(this)
+                || this.tickCount % 5 != 0) {
+            return;
+        }
+        if (TiansuluoPlayerNoticeDetector.seesPlayer(this)) {
+            this.state.setNoticedPlayer(true);
+            this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_NOTICE_PLAYER);
+        }
+    }
+
     private void playFoodFeedback(boolean favorite) {
         this.level().broadcastEntityEvent(this, favorite ? PinkScarfProfile.EVENT_EAT_FAVORITE : PinkScarfProfile.EVENT_EAT);
     }
@@ -311,7 +347,7 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
     @Override
     public boolean canFallInLove() {
         return this.isTame()
-                && !this.isInSittingPose()
+                && !this.isOrderedToSit()
                 && !this.state.hasCarriedEggBlock(this)
                 && super.canFallInLove();
     }
@@ -323,8 +359,8 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
                 && other instanceof TiansuluoPinkScarfEntity partner
                 && this.isTame()
                 && partner.isTame()
-                && !this.isInSittingPose()
-                && !partner.isInSittingPose()
+                && !this.isOrderedToSit()
+                && !partner.isOrderedToSit()
                 && !this.state.hasCarriedEggBlock(this)
                 && !partner.state.hasCarriedEggBlock(partner)
                 && this.isInLove()

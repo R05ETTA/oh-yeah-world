@@ -27,7 +27,6 @@ public final class BattleFacePounceAttack extends Goal {
     public boolean canUse() {
         LivingEntity target = this.entity.getTarget();
         return this.entity.state().getRetaliationTicksRemaining() > 0
-                && this.entity.state().getRetaliationDeclareTicksRemaining() <= 0
                 && this.entity.state().getPounceCooldownTicks() <= 0
                 && this.entity.onGround()
                 && target != null

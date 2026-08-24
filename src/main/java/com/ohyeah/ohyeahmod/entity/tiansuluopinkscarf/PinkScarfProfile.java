@@ -51,7 +51,10 @@ public final class PinkScarfProfile {
     public static final double EGG_MAX_TARGET_DISTANCE = 10.0D;
     /** 每次繁殖只产一个幼体，避免一块栾栾块批量生成过多实体。 */
     public static final int EGGS_PER_BREEDING = 1;
-    public static final int HATCH_CHANCE_INV = 500;
+    /** 放置成功后向该半径内的玩家发送聊天提示。 */
+    public static final double EGG_PLACED_NOTIFICATION_RADIUS = 16.0D;
+    /** 每个阶段 10 秒自动推进，三阶段总计约 30 秒。 */
+    public static final int HATCH_INTERVAL_TICKS = 200;
     /** 环境音最长约 9.24 秒；12 秒尝试间隔可避免同一实体自我重叠。 */
     public static final int AMBIENT_INTERVAL = 240;
     public static final float FOOD_HEAL_AMOUNT = 4.0F;
@@ -89,18 +92,20 @@ public final class PinkScarfProfile {
     public static final double PROJECTILE_FRONT_OFFSET = 0.12D;
 
     /** 这些事件只用于客户端动作反馈，服务端行为不依赖事件本身。 */
-    public static final byte EVENT_ATTACK_DECLARE = 60;
-    public static final byte EVENT_GROW_UP = 61;
-    public static final byte EVENT_SHEAR_REACT = 62;
-    public static final byte EVENT_EAT = 63;
-    public static final byte EVENT_EAT_FAVORITE = 64;
-    public static final byte EVENT_ATTACK_SHOT = 65;
-    public static final byte EVENT_ATTACK_END = 66;
-    public static final byte EVENT_HURT = 67;
-    public static final byte EVENT_DEATH = 68;
-    public static final byte EVENT_BREED_SUCCESS = 69;
+    public static final byte EVENT_ATTACK_DECLARE = -100;
+    public static final byte EVENT_GROW_UP = -99;
+    public static final byte EVENT_SHEAR_REACT = -98;
+    public static final byte EVENT_EAT = -97;
+    public static final byte EVENT_EAT_FAVORITE = -96;
+    public static final byte EVENT_ATTACK_SHOT = -95;
+    public static final byte EVENT_ATTACK_END = -94;
+    public static final byte EVENT_HURT = -93;
+    public static final byte EVENT_DEATH = -92;
+    public static final byte EVENT_BREED_SUCCESS = -91;
+    public static final byte EVENT_NOTICE_PLAYER = -90;
 
     private static final String CARRIED_MESSAGE_KEY = "message.ohyeah.tiansuluo_pink_scarf.luanluan_block_carried";
+    private static final String PLACED_MESSAGE_KEY = "message.ohyeah.tiansuluo_pink_scarf.luanluan_block_placed";
 
     private PinkScarfProfile() {
     }
@@ -116,6 +121,10 @@ public final class PinkScarfProfile {
 
     public static String getCarriedMessageKey() {
         return CARRIED_MESSAGE_KEY;
+    }
+
+    public static String getPlacedMessageKey() {
+        return PLACED_MESSAGE_KEY;
     }
 
     public static Block getSpeciesEggBlock() {

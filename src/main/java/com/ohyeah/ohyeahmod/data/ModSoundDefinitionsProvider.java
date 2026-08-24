@@ -29,6 +29,7 @@ public final class ModSoundDefinitionsProvider extends SoundDefinitionsProvider 
         add(ModSoundEvents.TIANSULUO_ATTACK_DECLARE, definition().subtitle("subtitles.ohyeah.tiansuluo.attack_declare").with(sound("ohyeah:entity/tiansuluo/attack_declare_01")));
         add(ModSoundEvents.TIANSULUO_GROW_UP, definition().subtitle("subtitles.ohyeah.tiansuluo.grow_up").with(sound("ohyeah:entity/tiansuluo/breed_success_01")));
         add(ModSoundEvents.TIANSULUO_SHEAR_REACT, definition().subtitle("subtitles.ohyeah.tiansuluo.shear_react").with(sound("ohyeah:entity/tiansuluo/shear_react_01")));
+        add(ModSoundEvents.TIANSULUO_NOTICE_PLAYER, definition().subtitle("subtitles.ohyeah.tiansuluo.notice_player").with(sound("ohyeah:entity/tiansuluo/notice_player_01")));
 
         // --- Pink Scarf Tiansuluo ---
         add(ModSoundEvents.TIANSULUO_PS_AMBIENT, definition().subtitle("subtitles.ohyeah.tiansuluo_ps.ambient").with(

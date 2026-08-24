@@ -22,9 +22,9 @@ public final class SuxiaProfile {
     /** 原版鱿鱼环境音为短音频；6 秒尝试间隔避免刷音。 */
     public static final int AMBIENT_INTERVAL = 120;
 
-    public static final byte EVENT_HURT = 60;
-    public static final byte EVENT_DEATH = 61;
-    public static final byte EVENT_SQUIRT = 62;
+    public static final byte EVENT_HURT = -100;
+    public static final byte EVENT_DEATH = -99;
+    public static final byte EVENT_SQUIRT = -98;
     private SuxiaProfile() {
     }
 

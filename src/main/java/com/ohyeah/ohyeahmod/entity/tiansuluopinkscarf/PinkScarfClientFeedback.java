@@ -31,6 +31,7 @@ public final class PinkScarfClientFeedback {
             return;
         }
         switch (status) {
+            case PinkScarfProfile.EVENT_NOTICE_PLAYER -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_NOTICE_PLAYER.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_NOTICE_PLAYER, false);
             case PinkScarfProfile.EVENT_ATTACK_DECLARE -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_DECLARE.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_DECLARE, false);
             case PinkScarfProfile.EVENT_GROW_UP -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_GROW_UP.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_GROW_UP, false);
             case PinkScarfProfile.EVENT_SHEAR_REACT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_SHEAR_REACT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_SHEAR, true);

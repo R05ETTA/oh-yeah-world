@@ -22,6 +22,8 @@ public final class ModSoundEvents {
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_ATTACK_DECLARE = register("tiansuluo.attack_declare");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_GROW_UP = register("tiansuluo.grow_up");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_SHEAR_REACT = register("tiansuluo.shear_react");
+    /** Shared by both Tiansuluo subspecies when they notice a player for the first time. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_NOTICE_PLAYER = register("tiansuluo.notice_player");
 
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_AMBIENT = register("tiansuluo_ps.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_HURT = register("tiansuluo_ps.hurt");

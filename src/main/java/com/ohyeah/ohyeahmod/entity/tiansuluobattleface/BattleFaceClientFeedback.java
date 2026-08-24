@@ -24,6 +24,7 @@ public final class BattleFaceClientFeedback {
             return;
         }
         switch (status) {
+            case BattleFaceProfile.EVENT_NOTICE_PLAYER -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_NOTICE_PLAYER.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_NOTICE_PLAYER, false);
             case BattleFaceProfile.EVENT_ATTACK_DECLARE -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_ATTACK_DECLARE.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_DECLARE, false);
             case BattleFaceProfile.EVENT_GROW_UP -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_GROW_UP.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_GROW_UP, false);
             case BattleFaceProfile.EVENT_SHEAR_REACT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_SHEAR_REACT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_SHEAR, true);

@@ -62,7 +62,7 @@ public abstract class ModLangProvider extends LanguageProvider {
 
             // Messages - Pink Scarf
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_carried", "Scarf Luo Tiansuluo is carrying a Luanluan Block and looking for a place to put it...");
-            add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_placed", "Scarf Luo Tiansuluo placed a Luanluan Block. Total blocks: %s");
+            add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_placed", "Scarf Luo Tiansuluo placed a Luanluan Block.");
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_hatch_progress", "Scarf Luo Luanluan hatch progress: Stage %s / %s");
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_hatched", "Scarf Luo Luanluan hatched! Spawned babies: %s");
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_broken", "You crushed a Scarf Luo Luanluan Block!");
@@ -76,6 +76,7 @@ public abstract class ModLangProvider extends LanguageProvider {
 
             // Subtitles - Tiansuluo (Battle Face)
             add("subtitles.ohyeah.tiansuluo.ambient", "Battle Face Tiansuluo murmurs softly");
+            add("subtitles.ohyeah.tiansuluo.notice_player", "A Tiansuluo notices a player");
             add("subtitles.ohyeah.tiansuluo.hurt", "Battle Face Tiansuluo cries out");
             add("subtitles.ohyeah.tiansuluo.death", "Battle Face Tiansuluo collapses");
             add("subtitles.ohyeah.tiansuluo.eat", "Battle Face Tiansuluo is chewing");
@@ -114,7 +115,7 @@ public abstract class ModLangProvider extends LanguageProvider {
             addAdvancement("tame_scarf_luo", "A New Companion", "Tame a Scarf Luo.");
             addAdvancement("tame_battle_face", "A Fierce Companion", "Tame a Battle Face.");
             addAdvancement("owner_combat", "Fight Together", "Let a tamed Tiansuluo join your attack.");
-            addAdvancement("shear", "A Little Wool", "Shear a tamed Tiansuluo.");
+            addAdvancement("shear", "A Little Wool", "Shear a Tiansuluo.");
             addAdvancement("restore_voice", "Give Back Its Voice", "Feed a silenced Tiansuluo.");
             addAdvancement("breed_tiansuluo", "Luanluan Begins", "Breed two tamed Tiansuluo.");
             addAdvancement("hatch_luanluan", "A New Luanluan", "Hatch a Luanluan Block.");
@@ -163,7 +164,7 @@ public abstract class ModLangProvider extends LanguageProvider {
 
             // Messages - Pink Scarf
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_carried", "天素罗亚种_围巾罗已进入带蛋状态，会在自身附近寻找最近的合法位置放置栾栾块");
-            add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_placed", "天素罗亚种_围巾罗已放置栾栾块，当前块数：%s");
+            add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_placed", "天素罗亚种_围巾罗已放置栾栾块");
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_hatch_progress", "围巾罗栾栾块孵化进度：第 %s / %s 阶段");
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_hatched", "围巾罗栾栾块已孵化，诞生幼体数量：%s");
             add("message.ohyeah.tiansuluo_pink_scarf.luanluan_block_broken", "你踩碎了一枚天素罗亚种_围巾罗栾栾块");
@@ -177,6 +178,7 @@ public abstract class ModLangProvider extends LanguageProvider {
 
             // Subtitles - Tiansuluo (Battle Face)
             add("subtitles.ohyeah.tiansuluo.ambient", "天素罗亚种_战斗脸轻声呢喃");
+            add("subtitles.ohyeah.tiansuluo.notice_player", "天素罗注意到了玩家");
             add("subtitles.ohyeah.tiansuluo.hurt", "天素罗亚种_战斗脸发出痛叫");
             add("subtitles.ohyeah.tiansuluo.death", "天素罗亚种_战斗脸瘫软倒下");
             add("subtitles.ohyeah.tiansuluo.eat", "天素罗亚种_战斗脸在咀嚼");

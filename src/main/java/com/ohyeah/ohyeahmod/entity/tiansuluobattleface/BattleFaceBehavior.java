@@ -31,14 +31,13 @@ public final class BattleFaceBehavior {
         boolean isTamingAttempt = !isBaby && !entity.isTame() && favoriteFood;
         boolean isOwner = entity.isTame() && entity.isOwnedBy(player);
         boolean isHealing = isOwner && !isBaby && entity.getHealth() < entity.getMaxHealth();
-        boolean isBreeding = isOwner
+        boolean isBreeding = entity.isTame()
                 && !isBaby
-                && !entity.isInSittingPose()
+                && !entity.isOrderedToSit()
                 && !entity.state().hasCarriedEggBlock(entity)
-                && entity.getHealth() >= entity.getMaxHealth()
                 && entity.getAge() == 0
                 && !entity.isInLove()
-                && favoriteFood;
+                && !isHealing;
 
         /* 先判断服务端真正会接受的交互，避免无效喂食提前返回 CONSUME、解除禁声或播放特效。 */
         if (!isBaby && !isTamingAttempt && !isHealing && !isBreeding) {
@@ -101,7 +100,10 @@ public final class BattleFaceBehavior {
 
         if (isBreeding) {
             entity.setInLove(player);
-            entity.level().broadcastEntityEvent(entity, BattleFaceProfile.EVENT_EAT_FAVORITE);
+            entity.level().broadcastEntityEvent(
+                    entity,
+                    favoriteFood ? BattleFaceProfile.EVENT_EAT_FAVORITE : BattleFaceProfile.EVENT_EAT
+            );
             return InteractionResult.SUCCESS;
         }
 
@@ -162,7 +164,7 @@ public final class BattleFaceBehavior {
                 || partner.state().hasCarriedEggBlock(partner)) {
             return false;
         }
-        if (entity.isInSittingPose() || partner.isInSittingPose()) {
+        if (entity.isOrderedToSit() || partner.isOrderedToSit()) {
             return false;
         }
         return entity.isInLove() && partner.isInLove();

@@ -4,6 +4,7 @@ import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.TiansuluoPinkScarfEntity;
+import com.ohyeah.ohyeahmod.entity.logic.SleepWakeGameplayCoordinator;
 import com.ohyeah.ohyeahmod.entity.logic.SleepWakeSpeciesHandler;
 import com.ohyeah.ohyeahmod.registry.ModEntityTypes;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,17 +43,21 @@ public final class TiansuluoPinkScarfBedWakeSpawner implements SleepWakeSpeciesH
     @Override
     public boolean shouldQueueSpawn(ServerPlayer player) {
         if (player == null) return false;
-        if (player.getSleepingPos().isEmpty()) return false;
-        return isBed(player.serverLevel(), player.getSleepingPos().get());
+        return player.getSleepingPos()
+                .filter(pos -> this.canSpawnAt(player, pos))
+                .isPresent();
     }
 
     @Override
     public boolean canSpawnAt(ServerPlayer player, BlockPos bedPos) {
-        return isBed(player.serverLevel(), bedPos);
+        if (player == null || bedPos == null) return false;
+        ServerLevel world = player.serverLevel();
+        return isBed(world, bedPos) && !hasNearbyPinkScarf(world, bedPos);
     }
 
     @Override
     public void trySpawn(ServerPlayer player, BlockPos bedPos) {
+        if (!this.canSpawnAt(player, bedPos)) return;
         ServerLevel world = player.serverLevel();
         
         List<BlockPos> spawnPositions = findSpawnPositions(world, bedPos, 4, 2);
@@ -105,6 +111,15 @@ public final class TiansuluoPinkScarfBedWakeSpawner implements SleepWakeSpeciesH
             }
         }
         return positions;
+    }
+
+    private static boolean hasNearbyPinkScarf(ServerLevel world, BlockPos bedPos) {
+        AABB area = new AABB(bedPos).inflate(SleepWakeGameplayCoordinator.SLEEP_WAKE_RADIUS);
+        return !world.getEntitiesOfClass(
+                TiansuluoPinkScarfEntity.class,
+                area,
+                TiansuluoPinkScarfEntity::isAlive
+        ).isEmpty();
     }
 
     private static boolean isSafeSpawnPos(ServerLevel world, BlockPos pos, BlockPos bedPos) {

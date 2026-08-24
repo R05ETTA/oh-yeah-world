@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -28,17 +32,8 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Verify release tag
-        shell: bash
-        run: |
-          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
-          test "v${version}" = "${GITHUB_REF_NAME}"
-
-      - name: Generate resources
-        run: ./gradlew runData --no-daemon --console=plain
-
-      - name: Build mod
-        run: ./gradlew build --no-daemon --console=plain
+      - name: Verify release
+        run: ./gradlew releaseCheck --no-daemon --console=plain
 
       - name: Create GitHub Release
         env:

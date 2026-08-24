@@ -36,6 +36,7 @@ public final class ClientSoundManager {
     public static final int PRIORITY_AMBIENT = 10;
     public static final int PRIORITY_HURT = 25;
     public static final int PRIORITY_ATTACK_DECLARE = 35;
+    public static final int PRIORITY_NOTICE_PLAYER = 45;
     public static final int PRIORITY_GROW_UP = 40;
     public static final int PRIORITY_EAT = 60;
     public static final int PRIORITY_EAT_FAVORITE = 65;

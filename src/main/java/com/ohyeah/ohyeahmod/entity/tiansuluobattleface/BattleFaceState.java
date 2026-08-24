@@ -18,9 +18,11 @@ public final class BattleFaceState {
     private static final String TAG_EGG_BLOCK_TARGET_Y = "LuanluanBlockTargetY";
     private static final String TAG_EGG_BLOCK_TARGET_Z = "LuanluanBlockTargetZ";
     private static final String TAG_EGG_BLOCK_PLACING_COUNTER = "LuanluanBlockPlacingCounter";
+    private static final String TAG_NOTICED_PLAYER = "NoticedPlayer";
 
     private @Nullable BlockPos eggBlockTargetPos;
     private int eggBlockPlacingCounter;
+    private boolean noticedPlayer;
     private int pounceCooldownTicks;
     private int retaliationDeclareTicksRemaining;
     private int retaliationTicksRemaining;
@@ -40,6 +42,7 @@ public final class BattleFaceState {
             nbt.putInt(TAG_EGG_BLOCK_TARGET_Z, this.eggBlockTargetPos.getZ());
         }
         nbt.putInt(TAG_EGG_BLOCK_PLACING_COUNTER, this.eggBlockPlacingCounter);
+        nbt.putBoolean(TAG_NOTICED_PLAYER, this.noticedPlayer);
     }
 
     public void readAdditionalSaveData(TiansuluoBattleFaceEntity entity, CompoundTag nbt) {
@@ -58,6 +61,7 @@ public final class BattleFaceState {
         this.eggBlockPlacingCounter = carrying
                 ? Math.max(0, nbt.getInt(TAG_EGG_BLOCK_PLACING_COUNTER))
                 : 0;
+        this.noticedPlayer = nbt.getBoolean(TAG_NOTICED_PLAYER);
     }
 
     public void setSilenced(TiansuluoBattleFaceEntity entity, boolean silenced) {
@@ -138,5 +142,12 @@ public final class BattleFaceState {
 
     public void setWasBabyLastTick(boolean wasBabyLastTick) {
         this.wasBabyLastTick = wasBabyLastTick;
+    }
+    public boolean hasNoticedPlayer() {
+        return this.noticedPlayer;
+    }
+
+    public void setNoticedPlayer(boolean noticedPlayer) {
+        this.noticedPlayer = noticedPlayer;
     }
 }

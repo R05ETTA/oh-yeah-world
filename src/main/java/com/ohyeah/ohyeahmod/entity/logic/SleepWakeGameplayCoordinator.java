@@ -18,7 +18,7 @@ public final class SleepWakeGameplayCoordinator {
     
     // --- 全局睡眠联动常量 ---
     public static final boolean SLEEP_WAKE_ENABLED = true;
-    public static final int SLEEP_WAKE_RADIUS = 6;
+    public static final int SLEEP_WAKE_RADIUS = 16;
 
     // 存储所有注册的睡眠唤醒处理器
     private static final Map<String, SleepWakeSpeciesHandler> HANDLERS = new LinkedHashMap<>();

@@ -14,9 +14,9 @@ import net.minecraft.world.entity.player.Player;
 public final class BattleFaceGoalRegistrar {
     public void registerGoals(TiansuluoBattleFaceEntity entity) {
         entity.goalSelector.addGoal(0, new FloatGoal(entity));
-        entity.goalSelector.addGoal(1, new SitWhenOrderedToGoal(entity));
-        // 反击 Goal 自己负责靠近、宣言和扑击，避免 MeleeAttackGoal 形成第二套战斗逻辑。
-        entity.goalSelector.addGoal(2, new BattleFacePounceAttack(entity));
+        // 反击 Goal 高于坐下，战斗时临时站起；结束后保留的坐下命令会让它自动坐回。
+        entity.goalSelector.addGoal(1, new BattleFacePounceAttack(entity));
+        entity.goalSelector.addGoal(2, new SitWhenOrderedToGoal(entity));
         entity.goalSelector.addGoal(3, new BreedGoal(entity, 1.1D));
         entity.goalSelector.addGoal(4, new TemptGoal(entity, 1.1D, entity::isFood, false));
         entity.goalSelector.addGoal(5, new FollowOwnerGoal(entity, 1.1D, 10.0F, 2.0F));

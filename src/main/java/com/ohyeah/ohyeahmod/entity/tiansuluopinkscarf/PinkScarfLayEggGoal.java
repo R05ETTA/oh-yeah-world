@@ -3,6 +3,8 @@ package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf;
 import com.ohyeah.ohyeahmod.block.LuanluanEggBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -191,14 +193,18 @@ public final class PinkScarfLayEggGoal extends MoveToBlockGoal {
         level.playSound(null, eggPos, SoundEvents.TURTLE_LAY_EGG, SoundSource.BLOCKS, 0.3F, 0.9F + level.random.nextFloat() * 0.2F);
         level.gameEvent(GameEvent.BLOCK_PLACE, eggPos, GameEvent.Context.of(this.entity, eggState));
 
-        java.util.UUID playerUuid = this.entity.state().getEggBlockPlayerUuid();
-        if (playerUuid != null) {
-            net.minecraft.world.entity.player.Player player = level.getPlayerByUUID(playerUuid);
-            if (player != null) {
-                player.displayClientMessage(
-                        Component.translatable(PinkScarfProfile.getCarriedMessageKey()),
-                        true
-                );
+        if (level instanceof ServerLevel serverLevel) {
+            double radiusSquared = PinkScarfProfile.EGG_PLACED_NOTIFICATION_RADIUS
+                    * PinkScarfProfile.EGG_PLACED_NOTIFICATION_RADIUS;
+            Component message = Component.translatable(PinkScarfProfile.getPlacedMessageKey());
+            for (ServerPlayer player : serverLevel.players()) {
+                if (player.distanceToSqr(
+                        eggPos.getX() + 0.5D,
+                        eggPos.getY() + 0.5D,
+                        eggPos.getZ() + 0.5D
+                ) <= radiusSquared) {
+                    player.displayClientMessage(message, false);
+                }
             }
         }
 
