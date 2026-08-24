@@ -40,7 +40,7 @@ public final class ModSoundEvents {
     public static final DeferredHolder<SoundEvent, SoundEvent> SUXIA_AMBIENT = register("suxia.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> SUXIA_HURT = register("suxia.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> SUXIA_DEATH = register("suxia.death");
-    public static final DeferredHolder<SoundEvent, SoundEvent> SUXIA_SQUIRT = register("suxia.squirt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SUXIA_LUANLUAN_SHOT = register("suxia.luanluan_shot");
     private ModSoundEvents() {
     }
 

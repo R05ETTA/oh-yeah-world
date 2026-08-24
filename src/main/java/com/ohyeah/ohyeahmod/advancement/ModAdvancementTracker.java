@@ -4,6 +4,7 @@ import com.ohyeah.ohyeahmod.OhYeah;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,7 +23,28 @@ public final class ModAdvancementTracker {
 
     public static void awardEncounter(ServerPlayer player, String advancementId, String collectionCriterion) {
         award(player, advancementId);
+        if (player == null) {
+            return;
+        }
+
+        MinecraftServer server = player.getServer();
+        if (server == null) {
+            return;
+        }
+
+        AdvancementHolder collection = server.getAdvancements().get(ModAdvancementIds.id(ModAdvancementIds.COLLECT_SPECIES));
+        if (collection == null) {
+            return;
+        }
+
+        boolean wasComplete = player.getAdvancements().getOrStartProgress(collection).isDone();
         award(player, ModAdvancementIds.COLLECT_SPECIES, collectionCriterion);
+        if (!wasComplete && player.getAdvancements().getOrStartProgress(collection).isDone()) {
+            player.displayClientMessage(
+                    Component.translatable("message.ohyeah.collect_species_complete"),
+                    true
+            );
+        }
     }
 
     public static void award(ServerPlayer player, String advancementId, String criterion) {
@@ -45,13 +67,25 @@ public final class ModAdvancementTracker {
             return;
         }
 
-        if (!ModAdvancementIds.ROOT.equals(advancementId)) {
-            AdvancementHolder root = server.getAdvancements().get(ModAdvancementIds.id(ModAdvancementIds.ROOT));
-            if (root != null) {
-                player.getAdvancements().award(root, "root");
-            }
-        }
+        awardParentChain(player, server, advancement);
         player.getAdvancements().award(advancement, criterion);
+    }
+
+    private static void awardParentChain(ServerPlayer player, MinecraftServer server, AdvancementHolder advancement) {
+        AdvancementHolder current = advancement;
+        while (current.value().parent().isPresent()) {
+            AdvancementHolder parent = server.getAdvancements().get(current.value().parent().get());
+            if (parent == null) {
+                return;
+            }
+            String criterion = parent.value().criteria().containsKey(ModAdvancementIds.ROOT)
+                    ? ModAdvancementIds.ROOT
+                    : "complete";
+            if (parent.value().criteria().containsKey(criterion)) {
+                player.getAdvancements().award(parent, criterion);
+            }
+            current = parent;
+        }
     }
 
     public static void checkEncounter(LivingEntity entity, String advancementId, String collectionCriterion) {

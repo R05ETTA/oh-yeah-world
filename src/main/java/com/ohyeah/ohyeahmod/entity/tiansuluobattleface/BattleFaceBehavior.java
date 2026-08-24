@@ -119,6 +119,7 @@ public final class BattleFaceBehavior {
 
         TiansuluoBattleFaceEntity parent = entity.getRandom().nextBoolean() ? entity : partner;
         parent.state().setHasCarriedEggBlock(parent, true);
+        parent.state().setCarriedEggCount(BattleFaceProfile.randomLuanluanCount(parent.getRandom()));
 
         entity.setAge(BattleFaceProfile.PARENT_BREEDING_COOLDOWN_TICKS);
         partner.setAge(BattleFaceProfile.PARENT_BREEDING_COOLDOWN_TICKS);

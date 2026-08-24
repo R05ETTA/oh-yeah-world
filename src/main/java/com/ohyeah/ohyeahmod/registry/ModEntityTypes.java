@@ -2,6 +2,7 @@ package com.ohyeah.ohyeahmod.registry;
 
 import com.ohyeah.ohyeahmod.OhYeah;
 import com.ohyeah.ohyeahmod.entity.suxia.SuxiaEntity;
+import com.ohyeah.ohyeahmod.entity.suxia.SuxiaLuanluanProjectileEntity;
 import com.ohyeah.ohyeahmod.entity.suxia.SuxiaProfile;
 import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.BattleFaceProfile;
 import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.TiansuluoBattleFaceEntity;
@@ -51,6 +52,14 @@ public final class ModEntityTypes {
                     .eyeHeight(0.4F)
                     .clientTrackingRange(8)
                     .build("suxia")
+    );
+    public static final DeferredHolder<EntityType<?>, EntityType<SuxiaLuanluanProjectileEntity>> SUXIA_LUANLUAN_PROJECTILE = ENTITY_TYPES.register(
+            "suxia_luanluan_projectile",
+            () -> EntityType.Builder.<SuxiaLuanluanProjectileEntity>of(SuxiaLuanluanProjectileEntity::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .clientTrackingRange(4)
+                    .updateInterval(10)
+                    .build("suxia_luanluan_projectile")
     );
 
     private ModEntityTypes() {

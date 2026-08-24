@@ -197,7 +197,10 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         super.dropCustomDeathLoot(level, source, recentlyHit);
         if (!this.isBaby()) {
             this.spawnAtLocation(ModItems.CHIPS.get());
-            this.spawnAtLocation(ModItems.TIANSULUO_PINK_SCARF_EGG.get());
+            this.spawnAtLocation(new ItemStack(
+                    ModItems.TIANSULUO_PINK_SCARF_EGG.get(),
+                    PinkScarfProfile.randomLuanluanCount(this.getRandom())
+            ));
         }
     }
 
@@ -224,6 +227,9 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
                 this.setOrderedToSit(sit);
                 if (sit) {
                     this.getNavigation().stop();
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.SIT_COMPANION);
+                    }
                 }
             }
             return InteractionResult.sidedSuccess(this.level().isClientSide);

@@ -182,7 +182,7 @@ public final class PinkScarfLayEggGoal extends MoveToBlockGoal {
         BlockPos eggPos = basePos.above();
         BlockState eggState = PinkScarfProfile.getSpeciesEggBlock()
                 .defaultBlockState()
-                .setValue(LuanluanEggBlock.EGGS, PinkScarfProfile.EGGS_PER_BREEDING);
+                .setValue(LuanluanEggBlock.EGGS, this.entity.state().getCarriedEggCount());
         Level level = this.entity.level();
         if (!level.setBlock(eggPos, eggState, 3)) {
             this.entity.state().setEggBlockTargetPos(null);

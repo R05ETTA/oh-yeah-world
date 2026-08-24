@@ -146,7 +146,7 @@ public final class ClientSoundManager {
         mc.getSoundManager().play(instance);
     }
 
-    /** 播放不占用实体主声音槽位的短特效音，例如素虾喷墨。 */
+    /** 播放不占用实体主声音槽位的短特效音。 */
     public static void playOverlay(LivingEntity entity, SoundEvent sound, SoundSource source) {
         if (sound == null || isSilenced(entity)) {
             return;

@@ -6,10 +6,12 @@ import com.ohyeah.ohyeahmod.entity.tiansuluo.TiansuluoPlayerNoticeDetector;
 import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -17,6 +19,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.animal.Animal;
@@ -26,6 +29,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -67,6 +71,19 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
         return Animal.checkAnimalSpawnRules(type, level, spawnType, pos, random);
     }
 
+    @Override
+    public @Nullable SpawnGroupData finalizeSpawn(
+            ServerLevelAccessor level,
+            DifficultyInstance difficulty,
+            MobSpawnType spawnType,
+            @Nullable SpawnGroupData spawnGroupData
+    ) {
+        SpawnGroupData result = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
+        if (spawnType == MobSpawnType.SPAWN_EGG || spawnType == MobSpawnType.BREEDING) {
+            this.setAge(BattleFaceProfile.BABY_AGE_TICKS);
+        }
+        return result;
+    }
     public static AttributeSupplier.Builder createAttributes() {
         return BattleFaceProfile.createAttributes();
     }
@@ -154,7 +171,10 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
         super.dropCustomDeathLoot(level, source, recentlyHit);
         if (this.isBaby()) return;
         this.spawnAtLocation(ModItems.CHIPS.get());
-        this.spawnAtLocation(ModItems.TIANSULUO_BATTLE_FACE_EGG.get());
+        this.spawnAtLocation(new ItemStack(
+                ModItems.TIANSULUO_BATTLE_FACE_EGG.get(),
+                BattleFaceProfile.randomLuanluanCount(this.getRandom())
+        ));
     }
     private void tickPlayerNotice() {
         if (this.state.hasNoticedPlayer()
@@ -179,6 +199,9 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
                 this.setOrderedToSit(sit);
                 if (sit) {
                     this.getNavigation().stop();
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.SIT_COMPANION);
+                    }
                 }
             }
             return InteractionResult.sidedSuccess(this.level().isClientSide);

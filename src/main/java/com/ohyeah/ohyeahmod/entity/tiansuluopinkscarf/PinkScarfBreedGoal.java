@@ -51,6 +51,7 @@ public final class PinkScarfBreedGoal extends BreedGoal {
         carrier.state().setHasCarriedEggBlock(carrier, true);
         carrier.state().setEggBlockTargetPos(null);
         carrier.state().setEggBlockPlacingCounter(0);
+        carrier.state().setCarriedEggCount(PinkScarfProfile.randomLuanluanCount(carrier.getRandom()));
 
         this.animal.setAge(PinkScarfProfile.PARENT_BREEDING_COOLDOWN_TICKS);
         partner.setAge(PinkScarfProfile.PARENT_BREEDING_COOLDOWN_TICKS);

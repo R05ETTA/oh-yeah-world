@@ -19,6 +19,11 @@ public final class ModAdvancementIds {
     public static final String HATCH_LUANLUAN = "hatch_luanluan";
     public static final String BEDSIDE_PAIR = "bedside_pair";
     public static final String COLLECT_SPECIES = "collect_species";
+    public static final String SIT_COMPANION = "sit_companion";
+    public static final String SMOKE_LUANLUAN = "smoke_luanluan";
+    public static final String EAT_XIAMI_HUHU = "eat_xiami_huhu";
+    public static final String FULL_LUANLUAN_NEST = "full_luanluan_nest";
+    public static final String SUXIA_LUANLUAN_SHOT = "suxia_luanluan_shot";
 
     private ModAdvancementIds() {
     }

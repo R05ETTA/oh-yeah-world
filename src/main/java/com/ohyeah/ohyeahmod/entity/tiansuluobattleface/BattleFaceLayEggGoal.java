@@ -1,5 +1,6 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
+import com.ohyeah.ohyeahmod.block.LuanluanEggBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -150,7 +151,8 @@ public final class BattleFaceLayEggGoal extends Goal {
             return;
         }
 
-        BlockState eggState = BattleFaceProfile.getSpeciesEggBlock().defaultBlockState();
+        BlockState eggState = BattleFaceProfile.getSpeciesEggBlock().defaultBlockState()
+                .setValue(LuanluanEggBlock.EGGS, this.entity.state().getCarriedEggCount());
         Level level = this.entity.level();
         if (!level.setBlock(pos, eggState, 3)) {
             return;

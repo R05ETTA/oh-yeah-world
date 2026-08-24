@@ -40,11 +40,11 @@ public abstract class ModLangProvider extends LanguageProvider {
             // Items
             addItem(ModItems.TIANSULUO_PINK_SCARF_EGG, "Scarf Luo Luanluan");
             add(ModItems.TIANSULUO_PINK_SCARF_EGG.get().getDescriptionId() + ".desc", "A special Luanluan of Tiansuluo Subspecies: Scarf Luo.");
-            add(ModItems.TIANSULUO_PINK_SCARF_EGG.get().getDescriptionId() + ".desc_2", "Dropped by adults. Right-click to spawn.");
+            add(ModItems.TIANSULUO_PINK_SCARF_EGG.get().getDescriptionId() + ".desc_2", "Dropped by adults (1-4). Right-click to spawn one baby.");
 
             addItem(ModItems.TIANSULUO_BATTLE_FACE_EGG, "Battle Face Luanluan");
             add(ModItems.TIANSULUO_BATTLE_FACE_EGG.get().getDescriptionId() + ".desc", "A special Luanluan of Tiansuluo Subspecies: Battle Face.");
-            add(ModItems.TIANSULUO_BATTLE_FACE_EGG.get().getDescriptionId() + ".desc_2", "Dropped by adults. Right-click to spawn.");
+            add(ModItems.TIANSULUO_BATTLE_FACE_EGG.get().getDescriptionId() + ".desc_2", "Dropped by adults (1-4). Right-click to spawn one baby.");
 
             addItem(ModItems.SUXIA_EGG, "Suxia Luanluan");
             add(ModItems.SUXIA_EGG.get().getDescriptionId() + ".desc", "A special Luanluan of Suxia.");
@@ -105,7 +105,8 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.suxia.ambient", "Suxia chirps softly");
             add("subtitles.ohyeah.suxia.hurt", "Suxia is hurt");
             add("subtitles.ohyeah.suxia.death", "Suxia dies");
-            add("subtitles.ohyeah.suxia.squirt", "Suxia sprays ink");
+            add("subtitles.ohyeah.suxia.luanluan_shot", "Suxia fires a Luanluan");
+            add("message.ohyeah.collect_species_complete", "Hello! Oh Yeah! World");
 
             addAdvancement("root", "Oh Yeah! World", "Meet the creatures of a new little world.");
             addAdvancement("meet_scarf_luo", "Meet Scarf Luo", "Encounter a Tiansuluo Subspecies: Scarf Luo.");
@@ -115,10 +116,15 @@ public abstract class ModLangProvider extends LanguageProvider {
             addAdvancement("tame_scarf_luo", "A New Companion", "Tame a Scarf Luo.");
             addAdvancement("tame_battle_face", "A Fierce Companion", "Tame a Battle Face.");
             addAdvancement("owner_combat", "Fight Together", "Let a tamed Tiansuluo join your attack.");
+            addAdvancement("sit_companion", "Sit, Stay, Good Tiansuluo", "Order a tamed Tiansuluo to sit.");
             addAdvancement("shear", "A Little Wool", "Shear a Tiansuluo.");
+            addAdvancement("smoke_luanluan", "Smoked Luanluan", "Turn a Tiansuluo Luanluan into Xiami Huhu in a smoker.");
+            addAdvancement("eat_xiami_huhu", "A Little Recovery", "Eat Xiami Huhu.");
             addAdvancement("restore_voice", "Give Back Its Voice", "Feed a silenced Tiansuluo.");
             addAdvancement("breed_tiansuluo", "Luanluan Begins", "Breed two tamed Tiansuluo.");
             addAdvancement("hatch_luanluan", "A New Luanluan", "Hatch a Luanluan Block.");
+            addAdvancement("full_luanluan_nest", "A Full Nest", "Hatch four Luanluan from one block.");
+            addAdvancement("suxia_luanluan_shot", "Incoming Luanluan", "Witness Suxia fire a Luanluan.");
             addAdvancement("bedside_pair", "A Bedside Surprise", "Wake up to a grown and young Scarf Luo.");
             addAdvancement("collect_species", "Oh Yeah! World Complete", "Meet all three creatures.");
         }
@@ -142,11 +148,11 @@ public abstract class ModLangProvider extends LanguageProvider {
             // Items
             addItem(ModItems.TIANSULUO_PINK_SCARF_EGG, "栾栾_围巾罗");
             add(ModItems.TIANSULUO_PINK_SCARF_EGG.get().getDescriptionId() + ".desc", "天素罗亚种_围巾罗的特殊栾栾");
-            add(ModItems.TIANSULUO_PINK_SCARF_EGG.get().getDescriptionId() + ".desc_2", "成年天素罗亚种_围巾罗掉落，右键生成天素罗亚种_围巾罗");
+            add(ModItems.TIANSULUO_PINK_SCARF_EGG.get().getDescriptionId() + ".desc_2", "成年天素罗亚种_围巾罗掉落（1-4个），右键生成一只幼体");
 
             addItem(ModItems.TIANSULUO_BATTLE_FACE_EGG, "栾栾_战斗脸");
             add(ModItems.TIANSULUO_BATTLE_FACE_EGG.get().getDescriptionId() + ".desc", "天素罗亚种_战斗脸的特殊栾栾");
-            add(ModItems.TIANSULUO_BATTLE_FACE_EGG.get().getDescriptionId() + ".desc_2", "成年天素罗亚种_战斗脸掉落，右键生成天素罗亚种_战斗脸");
+            add(ModItems.TIANSULUO_BATTLE_FACE_EGG.get().getDescriptionId() + ".desc_2", "成年天素罗亚种_战斗脸掉落（1-4个），右键生成一只幼体");
 
             addItem(ModItems.SUXIA_EGG, "栾栾_素虾");
             add(ModItems.SUXIA_EGG.get().getDescriptionId() + ".desc", "素虾的特殊栾栾");
@@ -207,7 +213,8 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.suxia.ambient", "素虾轻轻漫游");
             add("subtitles.ohyeah.suxia.hurt", "素虾受伤了");
             add("subtitles.ohyeah.suxia.death", "素虾倒下了");
-            add("subtitles.ohyeah.suxia.squirt", "素虾喷出墨汁");
+            add("subtitles.ohyeah.suxia.luanluan_shot", "素虾从头部发射了栾栾");
+            add("message.ohyeah.collect_species_complete", "你好！欧耶世界");
 
             addAdvancement("root", "欧耶世界", "认识这个略略的世界里的生物。");
             addAdvancement("meet_scarf_luo", "遇见围巾罗", "遇见天素罗亚种·围巾罗。");
@@ -217,10 +224,15 @@ public abstract class ModLangProvider extends LanguageProvider {
             addAdvancement("tame_scarf_luo", "新的伙伴", "驯服一只围巾罗。");
             addAdvancement("tame_battle_face", "勇敢的伙伴", "驯服一只战斗脸。");
             addAdvancement("owner_combat", "并肩作战", "让已驯服的天素罗加入你的战斗。");
+            addAdvancement("sit_companion", "坐好，别乱跑", "命令一只驯服的天素罗坐下。");
             addAdvancement("shear", "一点羊毛", "用剪刀剪下天素罗的红羊毛。");
+            addAdvancement("smoke_luanluan", "烟熏栾栾", "将一个天素罗栾栾放入烟熏炉制作虾米糊糊。");
+            addAdvancement("eat_xiami_huhu", "恢复一点", "食用虾米糊糊。");
             addAdvancement("restore_voice", "找回声音", "喂食一只被禁声的天素罗。");
             addAdvancement("breed_tiansuluo", "栾栾的开始", "让两只已驯服的天素罗繁殖。");
             addAdvancement("hatch_luanluan", "新的栾栾", "孵化一块栾栾块。");
+            addAdvancement("full_luanluan_nest", "满巢而出", "从一个栾栾块中孵化出 4 只幼体。");
+            addAdvancement("suxia_luanluan_shot", "栾栾来袭", "见证素虾从头部发射栾栾。");
             addAdvancement("bedside_pair", "床边的新客人", "醒来时发现床边出现一大一小两只围巾罗。");
             addAdvancement("collect_species", "欧耶世界完成", "遇见全部三种生物。");
         }

@@ -19,10 +19,12 @@ public final class PinkScarfState {
     private static final String TAG_EGG_BLOCK_TARGET_Z = "LuanluanBlockTargetZ";
     private static final String TAG_EGG_BLOCK_PLACING_COUNTER = "LuanluanBlockPlacingCounter";
     private static final String TAG_NOTICED_PLAYER = "NoticedPlayer";
+    private static final String TAG_CARRIED_EGG_COUNT = "CarriedEggCount";
 
     private @Nullable BlockPos eggBlockTargetPos;
     private int eggBlockPlacingCounter;
     private boolean noticedPlayer;
+    private int carriedEggCount = PinkScarfProfile.LUANLUAN_MIN_COUNT;
 
     public static void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(TiansuluoPinkScarfEntity.HAS_CARRIED_EGG_BLOCK, false);
@@ -39,6 +41,7 @@ public final class PinkScarfState {
         }
         nbt.putInt(TAG_EGG_BLOCK_PLACING_COUNTER, this.eggBlockPlacingCounter);
         nbt.putBoolean(TAG_NOTICED_PLAYER, this.noticedPlayer);
+        nbt.putInt(TAG_CARRIED_EGG_COUNT, this.carriedEggCount);
     }
 
     public void readAdditionalSaveData(TiansuluoPinkScarfEntity entity, CompoundTag nbt) {
@@ -54,6 +57,9 @@ public final class PinkScarfState {
         }
         this.eggBlockPlacingCounter = carrying ? Math.max(0, nbt.getInt(TAG_EGG_BLOCK_PLACING_COUNTER)) : 0;
         this.noticedPlayer = nbt.getBoolean(TAG_NOTICED_PLAYER);
+        this.carriedEggCount = carrying
+                ? this.clampEggCount(nbt.getInt(TAG_CARRIED_EGG_COUNT))
+                : PinkScarfProfile.LUANLUAN_MIN_COUNT;
     }
     public void setSilenced(TiansuluoPinkScarfEntity entity, boolean silenced) {
         entity.getEntityData().set(TiansuluoPinkScarfEntity.IS_SILENCED, silenced);
@@ -72,6 +78,7 @@ public final class PinkScarfState {
         if (!carrying) {
             this.eggBlockTargetPos = null;
             this.eggBlockPlacingCounter = 0;
+            this.carriedEggCount = PinkScarfProfile.LUANLUAN_MIN_COUNT;
         }
     }
 
@@ -90,6 +97,19 @@ public final class PinkScarfState {
     public void setEggBlockPlacingCounter(int counter) {
         this.eggBlockPlacingCounter = Math.max(0, counter);
     }
+    public int getCarriedEggCount() {
+        return this.carriedEggCount;
+    }
+
+    public void setCarriedEggCount(int count) {
+        this.carriedEggCount = this.clampEggCount(count);
+    }
+
+    private int clampEggCount(int count) {
+        return Math.max(PinkScarfProfile.LUANLUAN_MIN_COUNT,
+                Math.min(PinkScarfProfile.LUANLUAN_MAX_COUNT, count));
+    }
+
     public boolean hasNoticedPlayer() {
         return this.noticedPlayer;
     }

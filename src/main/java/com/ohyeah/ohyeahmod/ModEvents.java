@@ -1,9 +1,14 @@
 package com.ohyeah.ohyeahmod;
 
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.entity.logic.SleepWakeGameplayCoordinator;
+import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
 
 /**
@@ -18,6 +23,22 @@ public final class ModEvents {
             player.getSleepingPos().ifPresent(pos -> {
                 SleepWakeGameplayCoordinator.trySpawnAfterWake(player, pos);
             });
+        }
+    }
+
+    @SubscribeEvent
+    public static void onItemSmelted(PlayerEvent.ItemSmeltedEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player
+                && event.getSmelting().is(ModItems.XIAMI_HUHU.get())) {
+            ModAdvancementTracker.award(player, ModAdvancementIds.SMOKE_LUANLUAN);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onItemFinished(LivingEntityUseItemEvent.Finish event) {
+        if (event.getEntity() instanceof ServerPlayer player
+                && event.getItem().is(ModItems.XIAMI_HUHU.get())) {
+            ModAdvancementTracker.award(player, ModAdvancementIds.EAT_XIAMI_HUHU);
         }
     }
 }

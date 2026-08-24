@@ -29,10 +29,12 @@ public final class SuxiaClientFeedback {
                         false
                 );
             }
-            case SuxiaProfile.EVENT_SQUIRT -> ClientSoundManager.playOverlay(
+            case SuxiaProfile.EVENT_LUANLUAN_SHOT -> ClientSoundManager.playAction(
                     entity,
-                    ModSoundEvents.SUXIA_SQUIRT.get(),
-                    SoundSource.NEUTRAL
+                    ModSoundEvents.SUXIA_LUANLUAN_SHOT.get(),
+                    SoundSource.NEUTRAL,
+                    ClientSoundManager.PRIORITY_ATTACK_SHOT,
+                    false
             );
             default -> {
             }

@@ -6,6 +6,7 @@ import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -49,8 +50,9 @@ public final class PinkScarfProfile {
     public static final int EGG_MAX_TRAVEL_TICKS = 200;
     /** 已保存目标超过该距离时不再追逐。 */
     public static final double EGG_MAX_TARGET_DISTANCE = 10.0D;
-    /** 每次繁殖只产一个幼体，避免一块栾栾块批量生成过多实体。 */
-    public static final int EGGS_PER_BREEDING = 1;
+    /** 每次成年个体掉落和繁殖栾栾块的数量范围。 */
+    public static final int LUANLUAN_MIN_COUNT = 1;
+    public static final int LUANLUAN_MAX_COUNT = 4;
     /** 放置成功后向该半径内的玩家发送聊天提示。 */
     public static final double EGG_PLACED_NOTIFICATION_RADIUS = 16.0D;
     /** 每个阶段 10 秒自动推进，三阶段总计约 30 秒。 */
@@ -108,6 +110,10 @@ public final class PinkScarfProfile {
     private static final String PLACED_MESSAGE_KEY = "message.ohyeah.tiansuluo_pink_scarf.luanluan_block_placed";
 
     private PinkScarfProfile() {
+    }
+
+    public static int randomLuanluanCount(RandomSource random) {
+        return random.nextInt(LUANLUAN_MAX_COUNT - LUANLUAN_MIN_COUNT + 1) + LUANLUAN_MIN_COUNT;
     }
 
     public static AttributeSupplier.Builder createAttributes() {

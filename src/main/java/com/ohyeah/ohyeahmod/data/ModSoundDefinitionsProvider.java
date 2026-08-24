@@ -57,6 +57,6 @@ public final class ModSoundDefinitionsProvider extends SoundDefinitionsProvider 
         add(ModSoundEvents.SUXIA_AMBIENT, definition().subtitle("subtitles.ohyeah.suxia.ambient").with(sound("minecraft:entity.squid.ambient", SoundDefinition.SoundType.EVENT)));
         add(ModSoundEvents.SUXIA_HURT, definition().subtitle("subtitles.ohyeah.suxia.hurt").with(sound("minecraft:entity.squid.hurt", SoundDefinition.SoundType.EVENT)));
         add(ModSoundEvents.SUXIA_DEATH, definition().subtitle("subtitles.ohyeah.suxia.death").with(sound("minecraft:entity.squid.death", SoundDefinition.SoundType.EVENT)));
-        add(ModSoundEvents.SUXIA_SQUIRT, definition().subtitle("subtitles.ohyeah.suxia.squirt").with(sound("minecraft:entity.squid.squirt", SoundDefinition.SoundType.EVENT)));
+        add(ModSoundEvents.SUXIA_LUANLUAN_SHOT, definition().subtitle("subtitles.ohyeah.suxia.luanluan_shot").with(sound("minecraft:entity.snowball.throw", SoundDefinition.SoundType.EVENT)));
     }
 }

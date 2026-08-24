@@ -6,6 +6,7 @@ import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -21,9 +22,14 @@ public final class BattleFaceProfile {
     public static final float TARGET_ADULT_WIDTH = 0.7F;
     public static final float TARGET_ADULT_HEIGHT = 1.2F;
     public static final float BABY_SCALE_FACTOR = 0.5F;
+    /** Minecraft AgeableMob 使用负 tick 表示幼体。 */
+    public static final int BABY_AGE_TICKS = -24000;
 
     /** 每个阶段 10 秒自动推进，三阶段总计约 30 秒。 */
     public static final int HATCH_INTERVAL_TICKS = 200;
+    /** 每次成年个体掉落和繁殖栾栾块的数量范围。 */
+    public static final int LUANLUAN_MIN_COUNT = 1;
+    public static final int LUANLUAN_MAX_COUNT = 4;
     /** 环境音最长约 3.48 秒；6 秒尝试间隔保留播放余量。 */
     public static final int AMBIENT_INTERVAL = 120;
     /** 原生 Animal 繁殖后的父母冷却时间。 */
@@ -91,6 +97,10 @@ public final class BattleFaceProfile {
     private static final String CARRIED_MESSAGE_KEY = "message.ohyeah.tiansuluo_battle_face.luanluan_block_carried";
 
     private BattleFaceProfile() {
+    }
+
+    public static int randomLuanluanCount(RandomSource random) {
+        return random.nextInt(LUANLUAN_MAX_COUNT - LUANLUAN_MIN_COUNT + 1) + LUANLUAN_MIN_COUNT;
     }
 
     public static AttributeSupplier.Builder createAttributes() {

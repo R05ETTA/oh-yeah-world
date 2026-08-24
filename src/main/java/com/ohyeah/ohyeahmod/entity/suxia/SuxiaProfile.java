@@ -24,7 +24,9 @@ public final class SuxiaProfile {
 
     public static final byte EVENT_HURT = -100;
     public static final byte EVENT_DEATH = -99;
-    public static final byte EVENT_SQUIRT = -98;
+    public static final byte EVENT_LUANLUAN_SHOT = -98;
+    public static final float LUANLUAN_PROJECTILE_SPEED = 1.2F;
+    public static final float LUANLUAN_PROJECTILE_DAMAGE = 1.0F;
     private SuxiaProfile() {
     }
 

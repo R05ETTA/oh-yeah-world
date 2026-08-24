@@ -19,10 +19,12 @@ public final class BattleFaceState {
     private static final String TAG_EGG_BLOCK_TARGET_Z = "LuanluanBlockTargetZ";
     private static final String TAG_EGG_BLOCK_PLACING_COUNTER = "LuanluanBlockPlacingCounter";
     private static final String TAG_NOTICED_PLAYER = "NoticedPlayer";
+    private static final String TAG_CARRIED_EGG_COUNT = "CarriedEggCount";
 
     private @Nullable BlockPos eggBlockTargetPos;
     private int eggBlockPlacingCounter;
     private boolean noticedPlayer;
+    private int carriedEggCount = BattleFaceProfile.LUANLUAN_MIN_COUNT;
     private int pounceCooldownTicks;
     private int retaliationDeclareTicksRemaining;
     private int retaliationTicksRemaining;
@@ -43,6 +45,7 @@ public final class BattleFaceState {
         }
         nbt.putInt(TAG_EGG_BLOCK_PLACING_COUNTER, this.eggBlockPlacingCounter);
         nbt.putBoolean(TAG_NOTICED_PLAYER, this.noticedPlayer);
+        nbt.putInt(TAG_CARRIED_EGG_COUNT, this.carriedEggCount);
     }
 
     public void readAdditionalSaveData(TiansuluoBattleFaceEntity entity, CompoundTag nbt) {
@@ -62,6 +65,9 @@ public final class BattleFaceState {
                 ? Math.max(0, nbt.getInt(TAG_EGG_BLOCK_PLACING_COUNTER))
                 : 0;
         this.noticedPlayer = nbt.getBoolean(TAG_NOTICED_PLAYER);
+        this.carriedEggCount = carrying
+                ? this.clampEggCount(nbt.getInt(TAG_CARRIED_EGG_COUNT))
+                : BattleFaceProfile.LUANLUAN_MIN_COUNT;
     }
 
     public void setSilenced(TiansuluoBattleFaceEntity entity, boolean silenced) {
@@ -81,6 +87,7 @@ public final class BattleFaceState {
         if (!has) {
             this.eggBlockTargetPos = null;
             this.eggBlockPlacingCounter = 0;
+            this.carriedEggCount = BattleFaceProfile.LUANLUAN_MIN_COUNT;
         }
     }
 
@@ -143,6 +150,19 @@ public final class BattleFaceState {
     public void setWasBabyLastTick(boolean wasBabyLastTick) {
         this.wasBabyLastTick = wasBabyLastTick;
     }
+    public int getCarriedEggCount() {
+        return this.carriedEggCount;
+    }
+
+    public void setCarriedEggCount(int count) {
+        this.carriedEggCount = this.clampEggCount(count);
+    }
+
+    private int clampEggCount(int count) {
+        return Math.max(BattleFaceProfile.LUANLUAN_MIN_COUNT,
+                Math.min(BattleFaceProfile.LUANLUAN_MAX_COUNT, count));
+    }
+
     public boolean hasNoticedPlayer() {
         return this.noticedPlayer;
     }

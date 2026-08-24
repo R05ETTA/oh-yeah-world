@@ -1,8 +1,12 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
 import com.ohyeah.ohyeahmod.OhYeah;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
+import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.block.LuanluanEggBlock;
 import com.ohyeah.ohyeahmod.registry.ModBlocks;
+import com.ohyeah.ohyeahmod.entity.suxia.SuxiaEntity;
+import com.ohyeah.ohyeahmod.entity.suxia.SuxiaLuanluanProjectileEntity;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.TiansuluoPinkScarfEntity;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.spawn.TiansuluoPinkScarfBedWakeSpawner;
 import com.ohyeah.ohyeahmod.registry.ModEntityTypes;
@@ -13,8 +17,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -123,7 +129,7 @@ public final class ModGameTests {
         BlockPos eggPos = new BlockPos(2, 1, 2);
         var eggBlock = ModBlocks.TIANSULUO_BATTLE_FACE_LUANLUAN_BLOCK.get();
         helper.setBlock(eggPos, eggBlock.defaultBlockState()
-                .setValue(LuanluanEggBlock.EGGS, 1));
+                .setValue(LuanluanEggBlock.EGGS, 4));
 
         helper.runAtTickTime(210, () ->
                 helper.assertBlockProperty(eggPos, LuanluanEggBlock.HATCH, 1));
@@ -131,13 +137,65 @@ public final class ModGameTests {
                 helper.assertBlockProperty(eggPos, LuanluanEggBlock.HATCH, 2));
         helper.runAtTickTime(610, () -> {
             helper.assertBlockNotPresent(eggBlock, eggPos);
-            helper.assertEntityPresent(
-                    ModEntityTypes.TIANSULUO_BATTLE_FACE.get(),
-                    eggPos,
-                    2.0D
-            );
+            int hatchedCount = helper.getLevel().getEntitiesOfClass(
+                    TiansuluoBattleFaceEntity.class,
+                    new AABB(helper.absolutePos(eggPos)).inflate(8.0D)
+            ).size();
+            helper.assertValueEqual(hatchedCount, 4, "A four-egg block should hatch four Battle Faces");
             helper.succeed();
         });
+    }
+
+    @GameTest(template = TEMPLATE, batch = "ohyeah_suxia", timeoutTicks = 40)
+    public static void suxiaFiresOnDeathWhenMobLootIsDisabled(GameTestHelper helper) {
+        BlockPos suxiaPos = new BlockPos(2, 1, 2);
+        BlockPos absolutePos = helper.absolutePos(suxiaPos);
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = 0; dy <= 2; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    helper.getLevel().setBlock(
+                            absolutePos.offset(dx, dy, dz),
+                            Blocks.WATER.defaultBlockState(),
+                            3
+                    );
+                }
+            }
+        }
+
+        SuxiaEntity suxia = helper.spawn(ModEntityTypes.SUXIA.get(), suxiaPos);
+        suxia.setNoAi(true);
+        suxia.setPos(absolutePos.getX() + 0.5D, absolutePos.getY() + 0.25D, absolutePos.getZ() + 0.5D);
+        var attacker = helper.spawn(EntityType.COW, new BlockPos(7, 1, 2));
+        helper.getLevel().getGameRules().getRule(GameRules.RULE_DOMOBLOOT)
+                .set(false, helper.getLevel().getServer());
+        helper.runAtTickTime(1, () -> {
+            helper.assertTrue(suxia.isInWaterOrBubble(), "Suxia should be in water for the projectile test");
+            suxia.hurt(suxia.damageSources().mobAttack(attacker), 1000.0F);
+        });
+        helper.runAtTickTime(2, () -> {
+            int projectileCount = helper.getLevel().getEntitiesOfClass(
+                    SuxiaLuanluanProjectileEntity.class,
+                    new AABB(absolutePos).inflate(12.0D)
+            ).size();
+            helper.assertValueEqual(projectileCount, 1, "Suxia should fire one Luanluan on death");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE)
+    public static void collectingAllSpeciesCompletesFinalAdvancement(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        ModAdvancementTracker.awardEncounter(player, ModAdvancementIds.MEET_SCARF_LUO, "scarf_luo");
+        ModAdvancementTracker.awardEncounter(player, ModAdvancementIds.MEET_BATTLE_FACE, "battle_face");
+        ModAdvancementTracker.awardEncounter(player, ModAdvancementIds.MEET_SUXIA, "suxia");
+
+        var finalAdvancement = player.getServer().getAdvancements()
+                .get(ModAdvancementIds.id(ModAdvancementIds.COLLECT_SPECIES));
+        helper.assertTrue(
+                player.getAdvancements().getOrStartProgress(finalAdvancement).isDone(),
+                "Collecting all species should complete the final advancement"
+        );
+        helper.succeed();
     }
 
     @SuppressWarnings("removal")

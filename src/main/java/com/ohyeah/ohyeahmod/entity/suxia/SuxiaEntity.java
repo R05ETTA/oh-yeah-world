@@ -3,6 +3,8 @@ package com.ohyeah.ohyeahmod.entity.suxia;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.registry.ModItems;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
  * 素虾：一个保持轻量的原生水生生物。
  *
  * <p>它不加入天素罗的驯服、繁殖和状态系统；核心闭环只有水中生成、游动、
- * 薯片诱食、受伤/死亡喷墨、专属掉落和基础声音。</p>
+ * 栾栾发射、专属掉落和基础声音。</p>
  */
 public class SuxiaEntity extends WaterAnimal {
     private float tentacleAngle;
@@ -85,9 +87,11 @@ public class SuxiaEntity extends WaterAnimal {
 
     @Override
     public void die(DamageSource source) {
+        boolean shouldFireLuanluan = !this.level().isClientSide && this.isInWaterOrBubble();
         super.die(source);
-        if (!this.level().isClientSide && this.isInWaterOrBubble() && this.isDeadOrDying()) {
+        if (shouldFireLuanluan) {
             this.level().broadcastEntityEvent(this, SuxiaProfile.EVENT_DEATH);
+            this.fireLuanluanAt(source.getEntity());
         }
     }
 
@@ -101,40 +105,41 @@ public class SuxiaEntity extends WaterAnimal {
         boolean hurt = super.hurt(source, amount);
         if (hurt && !this.level().isClientSide && this.isAlive() && this.isInWaterOrBubble()) {
             this.level().broadcastEntityEvent(this, SuxiaProfile.EVENT_HURT);
-        }
-        if (hurt
-                && this.isAlive()
-                && this.isInWaterOrBubble()) {
-            this.spawnInk();
+            this.fireLuanluanAt(source.getEntity());
         }
         return hurt;
     }
 
-    @Override
-    protected void dropFromLootTable(DamageSource damageSource, boolean attackedRecently) {
-        super.dropFromLootTable(damageSource, attackedRecently);
-        if (!this.level().isClientSide && this.isInWaterOrBubble()) {
-            this.spawnInk();
-        }
-    }
 
-    private void spawnInk() {
-        if (this.level().isClientSide || !(this.level() instanceof ServerLevel serverLevel)) {
+    private void fireLuanluanAt(Entity target) {
+        if (!(this.level() instanceof ServerLevel serverLevel)
+                || !(target instanceof LivingEntity livingTarget)
+                || !livingTarget.isAlive()) {
             return;
         }
 
-        this.level().broadcastEntityEvent(this, SuxiaProfile.EVENT_SQUIRT);
-        serverLevel.sendParticles(
-                ParticleTypes.SQUID_INK,
+        Vec3 muzzle = new Vec3(
                 this.getX(),
-                this.getY() + this.getBbHeight() * 0.45D,
-                this.getZ(),
-                14,
-                this.getBbWidth() * 0.45D,
-                this.getBbHeight() * 0.25D,
-                this.getBbWidth() * 0.45D,
-                0.02D
+                this.getY() + this.getBbHeight() * 0.8D,
+                this.getZ()
         );
+        double deltaX = livingTarget.getX() - muzzle.x;
+        double deltaY = livingTarget.getY() + livingTarget.getBbHeight() * 0.5D - muzzle.y;
+        double deltaZ = livingTarget.getZ() - muzzle.z;
+
+        SuxiaLuanluanProjectileEntity projectile = new SuxiaLuanluanProjectileEntity(serverLevel, this);
+        projectile.setDamage(SuxiaProfile.LUANLUAN_PROJECTILE_DAMAGE);
+        projectile.setPos(muzzle.x, muzzle.y, muzzle.z);
+        projectile.shoot(
+                deltaX,
+                deltaY,
+                deltaZ,
+                SuxiaProfile.LUANLUAN_PROJECTILE_SPEED,
+                0.0F
+        );
+        serverLevel.addFreshEntity(projectile);
+        serverLevel.broadcastEntityEvent(this, SuxiaProfile.EVENT_LUANLUAN_SHOT);
+        ModAdvancementTracker.awardNearby(serverLevel, this.blockPosition(), ModAdvancementIds.SUXIA_LUANLUAN_SHOT);
     }
 
     @Override
@@ -186,7 +191,7 @@ public class SuxiaEntity extends WaterAnimal {
 
     @Override
     public void handleEntityEvent(byte status) {
-        if (status >= SuxiaProfile.EVENT_HURT && status <= SuxiaProfile.EVENT_SQUIRT) {
+        if (status >= SuxiaProfile.EVENT_HURT && status <= SuxiaProfile.EVENT_LUANLUAN_SHOT) {
             if (this.level().isClientSide) {
                 this.feedback.handleClientEntityEvent(this, status);
             }

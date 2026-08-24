@@ -47,17 +47,22 @@ public final class ModAdvancementProvider implements AdvancementProvider.Advance
                 .addCriterion("root", impossible())
                 .save(saver, ModAdvancementIds.id(ModAdvancementIds.ROOT), existingFileHelper);
 
-        saveTask(saver, existingFileHelper, root, ModAdvancementIds.MEET_SCARF_LUO, ModItems.TIANSULUO_PINK_SCARF_EGG.get());
-        saveTask(saver, existingFileHelper, root, ModAdvancementIds.MEET_BATTLE_FACE, ModItems.TIANSULUO_BATTLE_FACE_EGG.get());
-        saveTask(saver, existingFileHelper, root, ModAdvancementIds.MEET_SUXIA, ModItems.SUXIA_EGG.get());
+        AdvancementHolder meetScarf = saveTask(saver, existingFileHelper, root, ModAdvancementIds.MEET_SCARF_LUO, ModItems.TIANSULUO_PINK_SCARF_EGG.get());
+        AdvancementHolder meetBattle = saveTask(saver, existingFileHelper, root, ModAdvancementIds.MEET_BATTLE_FACE, ModItems.TIANSULUO_BATTLE_FACE_EGG.get());
+        AdvancementHolder meetSuxia = saveTask(saver, existingFileHelper, root, ModAdvancementIds.MEET_SUXIA, ModItems.SUXIA_EGG.get());
         saveTask(saver, existingFileHelper, root, ModAdvancementIds.FEED_GROW, Items.WHEAT);
-        saveTask(saver, existingFileHelper, root, ModAdvancementIds.TAME_SCARF_LUO, ModItems.CHIPS.get());
-        saveTask(saver, existingFileHelper, root, ModAdvancementIds.TAME_BATTLE_FACE, ModItems.CHIPS.get());
+        saveTask(saver, existingFileHelper, meetScarf, ModAdvancementIds.TAME_SCARF_LUO, ModItems.CHIPS.get());
+        saveTask(saver, existingFileHelper, meetBattle, ModAdvancementIds.TAME_BATTLE_FACE, ModItems.CHIPS.get());
         saveTask(saver, existingFileHelper, root, ModAdvancementIds.OWNER_COMBAT, ModItems.CHIPS.get());
-        saveTask(saver, existingFileHelper, root, ModAdvancementIds.SHEAR, Items.SHEARS);
-        saveTask(saver, existingFileHelper, root, ModAdvancementIds.RESTORE_VOICE, Items.WHEAT);
-        saveTask(saver, existingFileHelper, root, ModAdvancementIds.BREED_TIANSULUO, ModBlocks.TIANSULUO_PINK_SCARF_LUANLUAN_BLOCK.get());
-        saveTask(saver, existingFileHelper, root, ModAdvancementIds.HATCH_LUANLUAN, ModBlocks.TIANSULUO_BATTLE_FACE_LUANLUAN_BLOCK.get());
+        saveTask(saver, existingFileHelper, root, ModAdvancementIds.SIT_COMPANION, Items.LEAD);
+        AdvancementHolder shear = saveTask(saver, existingFileHelper, root, ModAdvancementIds.SHEAR, Items.SHEARS);
+        saveTask(saver, existingFileHelper, shear, ModAdvancementIds.RESTORE_VOICE, Items.WHEAT);
+        saveTask(saver, existingFileHelper, root, ModAdvancementIds.SMOKE_LUANLUAN, ModItems.XIAMI_HUHU.get());
+        saveTask(saver, existingFileHelper, root, ModAdvancementIds.EAT_XIAMI_HUHU, ModItems.XIAMI_HUHU.get());
+        AdvancementHolder breed = saveTask(saver, existingFileHelper, root, ModAdvancementIds.BREED_TIANSULUO, ModBlocks.TIANSULUO_PINK_SCARF_LUANLUAN_BLOCK.get());
+        AdvancementHolder hatch = saveTask(saver, existingFileHelper, breed, ModAdvancementIds.HATCH_LUANLUAN, ModBlocks.TIANSULUO_BATTLE_FACE_LUANLUAN_BLOCK.get());
+        saveTask(saver, existingFileHelper, hatch, ModAdvancementIds.FULL_LUANLUAN_NEST, ModBlocks.TIANSULUO_BATTLE_FACE_LUANLUAN_BLOCK.get());
+        saveTask(saver, existingFileHelper, meetSuxia, ModAdvancementIds.SUXIA_LUANLUAN_SHOT, ModItems.SUXIA_EGG.get());
         saveTask(saver, existingFileHelper, root, ModAdvancementIds.BEDSIDE_PAIR, Items.RED_BED);
 
         Advancement.Builder.advancement()
@@ -78,15 +83,15 @@ public final class ModAdvancementProvider implements AdvancementProvider.Advance
                 .save(saver, ModAdvancementIds.id(ModAdvancementIds.COLLECT_SPECIES), existingFileHelper);
     }
 
-    private static void saveTask(
+    private static AdvancementHolder saveTask(
             Consumer<AdvancementHolder> saver,
             ExistingFileHelper existingFileHelper,
-            AdvancementHolder root,
+            AdvancementHolder parent,
             String id,
             ItemLike icon
     ) {
-        Advancement.Builder.advancement()
-                .parent(root)
+        return Advancement.Builder.advancement()
+                .parent(parent)
                 .display(
                         icon,
                         title(id),

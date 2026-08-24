@@ -112,6 +112,9 @@ public final class LuanluanEggBlock extends Block {
         }
         if (hatchedCount > 0) {
             ModAdvancementTracker.awardNearby(level, pos, ModAdvancementIds.HATCH_LUANLUAN);
+            if (eggs >= 4 && hatchedCount == eggs) {
+                ModAdvancementTracker.awardNearby(level, pos, ModAdvancementIds.FULL_LUANLUAN_NEST);
+            }
         }
     }
 
