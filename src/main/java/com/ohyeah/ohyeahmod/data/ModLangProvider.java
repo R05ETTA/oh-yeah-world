@@ -79,6 +79,7 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.tiansuluo.notice_player", "A Tiansuluo notices a player");
             add("subtitles.ohyeah.tiansuluo.hurt", "Battle Face Tiansuluo cries out");
             add("subtitles.ohyeah.tiansuluo.death", "Battle Face Tiansuluo collapses");
+            add("subtitles.ohyeah.tiansuluo.luanluan_block_broken", "Bad human! Tiansuluo's cutest Luanluan! (placeholder voice)");
             add("subtitles.ohyeah.tiansuluo.eat", "Battle Face Tiansuluo is chewing");
             add("subtitles.ohyeah.tiansuluo.eat_favorite", "Battle Face Tiansuluo happily chews favorite food");
             add("subtitles.ohyeah.tiansuluo.breed_success", "Battle Face Tiansuluo chirps happily");
@@ -92,6 +93,7 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.tiansuluo_ps.ambient", "Scarf Luo Tiansuluo murmurs softly");
             add("subtitles.ohyeah.tiansuluo_ps.hurt", "Scarf Luo Tiansuluo cries out");
             add("subtitles.ohyeah.tiansuluo_ps.death", "Scarf Luo Tiansuluo collapses");
+            add("subtitles.ohyeah.tiansuluo_ps.luanluan_block_broken", "Bad human! Tiansuluo's cutest Luanluan! (placeholder voice)");
             add("subtitles.ohyeah.tiansuluo_ps.eat", "Scarf Luo Tiansuluo is chewing");
             add("subtitles.ohyeah.tiansuluo_ps.eat_favorite", "Scarf Luo Tiansuluo happily chews favorite food");
             add("subtitles.ohyeah.tiansuluo_ps.breed_success", "Scarf Luo Tiansuluo chirps happily");
@@ -189,6 +191,7 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.tiansuluo.notice_player", "天素罗注意到了玩家");
             add("subtitles.ohyeah.tiansuluo.hurt", "天素罗亚种_战斗脸发出痛叫");
             add("subtitles.ohyeah.tiansuluo.death", "天素罗亚种_战斗脸瘫软倒下");
+            add("subtitles.ohyeah.tiansuluo.luanluan_block_broken", "坏人类！天素罗宝宝最可爱的栾栾啊！超拟嘛超拟嘛的");
             add("subtitles.ohyeah.tiansuluo.eat", "天素罗亚种_战斗脸在咀嚼");
             add("subtitles.ohyeah.tiansuluo.eat_favorite", "天素罗亚种_战斗脸开心地吃着最爱的食物");
             add("subtitles.ohyeah.tiansuluo.breed_success", "天素罗亚种_战斗脸发出欢快叫声");
@@ -202,6 +205,7 @@ public abstract class ModLangProvider extends LanguageProvider {
             add("subtitles.ohyeah.tiansuluo_ps.ambient", "天素罗亚种_围巾罗轻声呢喃");
             add("subtitles.ohyeah.tiansuluo_ps.hurt", "天素罗亚种_围巾罗发出痛叫");
             add("subtitles.ohyeah.tiansuluo_ps.death", "天素罗亚种_围巾罗瘫软倒下");
+            add("subtitles.ohyeah.tiansuluo_ps.luanluan_block_broken", "坏人类！天素罗宝宝最可爱的栾栾啊！超拟嘛超拟嘛的");
             add("subtitles.ohyeah.tiansuluo_ps.eat", "天素罗亚种_围巾罗在咀嚼");
             add("subtitles.ohyeah.tiansuluo_ps.eat_favorite", "天素罗亚种_围巾罗开心地吃着最爱的食物");
             add("subtitles.ohyeah.tiansuluo_ps.breed_success", "天素罗亚种_围巾罗发出欢快叫声");

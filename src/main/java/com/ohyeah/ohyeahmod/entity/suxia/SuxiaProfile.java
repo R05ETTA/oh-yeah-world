@@ -1,5 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.suxia;
 
+import com.ohyeah.ohyeahmod.entity.tiansuluo.TiansuluoFoods;
+
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -21,6 +23,11 @@ public final class SuxiaProfile {
 
     /** 原版鱿鱼环境音为短音频；6 秒尝试间隔避免刷音。 */
     public static final int AMBIENT_INTERVAL = 120;
+
+    public static final TiansuluoFoods FOODS = new TiansuluoFoods(
+            List.of(),
+            List.of("ohyeah:chips", "ohyeah:xiami_huhu")
+    );
 
     public static final byte EVENT_HURT = -100;
     public static final byte EVENT_DEATH = -99;

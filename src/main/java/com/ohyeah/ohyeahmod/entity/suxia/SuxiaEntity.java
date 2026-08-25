@@ -2,7 +2,6 @@ package com.ohyeah.ohyeahmod.entity.suxia;
 
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
-import com.ohyeah.ohyeahmod.registry.ModItems;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.core.BlockPos;
@@ -64,7 +63,11 @@ public class SuxiaEntity extends WaterAnimal {
     }
 
     public boolean isFood(ItemStack stack) {
-        return stack.is(ModItems.CHIPS.get());
+        return SuxiaProfile.FOODS.isFood(stack);
+    }
+
+    public boolean isFavoriteFood(ItemStack stack) {
+        return SuxiaProfile.FOODS.isFavorite(stack);
     }
 
     @Override

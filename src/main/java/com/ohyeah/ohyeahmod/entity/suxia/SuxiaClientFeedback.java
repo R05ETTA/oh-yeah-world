@@ -7,7 +7,7 @@ import net.minecraft.sounds.SoundSource;
 /** 素虾的客户端声音入口。 */
 public final class SuxiaClientFeedback {
     public void tickClient(SuxiaEntity entity) {
-        ClientSoundManager.playAmbient(entity, ModSoundEvents.SUXIA_AMBIENT.get(), SuxiaProfile.AMBIENT_INTERVAL);
+        ClientSoundManager.playAmbient(entity, ModSoundEvents.SUXIA_AMBIENT.get());
     }
 
     public void handleClientEntityEvent(SuxiaEntity entity, byte status) {
@@ -19,16 +19,13 @@ public final class SuxiaClientFeedback {
                     ClientSoundManager.PRIORITY_HURT,
                     false
             );
-            case SuxiaProfile.EVENT_DEATH -> {
-                ClientSoundManager.stopSound(entity);
-                ClientSoundManager.playAction(
-                        entity,
-                        ModSoundEvents.SUXIA_DEATH.get(),
-                        SoundSource.NEUTRAL,
-                        ClientSoundManager.PRIORITY_DEATH,
-                        false
-                );
-            }
+            case SuxiaProfile.EVENT_DEATH -> ClientSoundManager.playDetachedAction(
+                    entity,
+                    ModSoundEvents.SUXIA_DEATH.get(),
+                    SoundSource.NEUTRAL,
+                    ClientSoundManager.PRIORITY_DEATH,
+                    false
+            );
             case SuxiaProfile.EVENT_LUANLUAN_SHOT -> ClientSoundManager.playAction(
                     entity,
                     ModSoundEvents.SUXIA_LUANLUAN_SHOT.get(),

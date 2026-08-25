@@ -4,25 +4,33 @@ import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.BattleFaceProfile;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.TiansuluoPinkScarfEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluobattleface.TiansuluoBattleFaceEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
  * 栾栾块。
  */
-public final class LuanluanEggBlock extends Block {
+public final class LuanluanEggBlock extends Block implements EntityBlock {
     public static final IntegerProperty HATCH = IntegerProperty.create("hatch", 0, 2);
     public static final IntegerProperty EGGS = IntegerProperty.create("eggs", 1, 4);
 
@@ -37,6 +45,40 @@ public final class LuanluanEggBlock extends Block {
         this.speciesId = speciesId;
         this.entityTypeSupplier = entityTypeSupplier;
         this.registerDefaultState(this.stateDefinition.any().setValue(HATCH, 0).setValue(EGGS, 1));
+    }
+
+    @Override
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new LuanluanEggBlockEntity(pos, state);
+    }
+
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        BlockState result = super.playerWillDestroy(level, pos, state, player);
+        if (level instanceof ServerLevel serverLevel
+                && level.getBlockEntity(pos) instanceof LuanluanEggBlockEntity eggBlockEntity) {
+            this.notifyParentOfBreak(serverLevel, eggBlockEntity.getParentUuid());
+        }
+        return result;
+    }
+
+    private void notifyParentOfBreak(ServerLevel level, @Nullable UUID parentUuid) {
+        if (parentUuid == null) {
+            return;
+        }
+
+        Entity parent = level.getEntity(parentUuid);
+        if (parent == null || !parent.isAlive()) {
+            return;
+        }
+
+        if (PinkScarfProfile.SPECIES_ID.equals(this.speciesId)
+                && parent instanceof TiansuluoPinkScarfEntity) {
+            level.broadcastEntityEvent(parent, PinkScarfProfile.EVENT_LUANLUAN_BLOCK_BROKEN);
+        } else if (BattleFaceProfile.SPECIES_ID.equals(this.speciesId)
+                && parent instanceof TiansuluoBattleFaceEntity) {
+            level.broadcastEntityEvent(parent, BattleFaceProfile.EVENT_LUANLUAN_BLOCK_BROKEN);
+        }
     }
 
     @Override

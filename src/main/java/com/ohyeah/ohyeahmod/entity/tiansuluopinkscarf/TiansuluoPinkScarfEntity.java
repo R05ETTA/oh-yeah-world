@@ -397,7 +397,7 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
     @Override
     public void handleEntityEvent(byte status) {
         if (status >= PinkScarfProfile.EVENT_ATTACK_DECLARE
-                && status <= PinkScarfProfile.EVENT_NOTICE_PLAYER) {
+                && status <= PinkScarfProfile.EVENT_LUANLUAN_BLOCK_BROKEN) {
             if (this.level().isClientSide) {
                 CLIENT_FEEDBACK.handleClientEntityEvent(this, status);
             }
@@ -566,6 +566,10 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
     @Override
     public boolean isFood(ItemStack stack) {
         return PinkScarfProfile.FOODS.isFood(stack);
+    }
+
+    public boolean isFavoriteFood(ItemStack stack) {
+        return PinkScarfProfile.FOODS.isFavorite(stack);
     }
 
     /* -------------------- IShearable：交给 NeoForge 的 ShearsItem 统一处理 -------------------- */

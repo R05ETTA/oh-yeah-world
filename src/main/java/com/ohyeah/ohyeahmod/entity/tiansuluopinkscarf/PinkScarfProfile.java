@@ -64,8 +64,6 @@ public final class PinkScarfProfile {
     public static final double EGG_PLACED_NOTIFICATION_RADIUS = 16.0D;
     /** 每个阶段 10 秒自动推进，三阶段总计约 30 秒。 */
     public static final int HATCH_INTERVAL_TICKS = 200;
-    /** 环境音最长约 9.24 秒；12 秒尝试间隔可避免同一实体自我重叠。 */
-    public static final int AMBIENT_INTERVAL = 240;
     public static final float FOOD_HEAL_AMOUNT = 4.0F;
 
     public static final List<String> FOOD_LIKED = List.of(
@@ -76,7 +74,8 @@ public final class PinkScarfProfile {
     );
     public static final List<String> FOOD_FAVORITE = List.of(
             "minecraft:cake",
-            "ohyeah:chips"
+            "ohyeah:chips",
+            "ohyeah:xiami_huhu"
     );
     public static final TiansuluoFoods FOODS = new TiansuluoFoods(FOOD_LIKED, FOOD_FAVORITE);
 
@@ -114,6 +113,8 @@ public final class PinkScarfProfile {
     public static final byte EVENT_ATTACK_END = -94;
     public static final byte EVENT_HURT = -93;
     public static final byte EVENT_DEATH = -92;
+    /** 玩家破坏该实体产下的栾栾块。 */
+    public static final byte EVENT_LUANLUAN_BLOCK_BROKEN = -89;
     public static final byte EVENT_BREED_SUCCESS = -91;
     public static final byte EVENT_NOTICE_PLAYER = -90;
 

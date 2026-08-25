@@ -5,8 +5,11 @@ import com.ohyeah.ohyeahmod.OhYeah;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
 import com.ohyeah.ohyeahmod.block.LuanluanEggBlock;
+import com.ohyeah.ohyeahmod.block.LuanluanEggBlockEntity;
 import com.ohyeah.ohyeahmod.registry.ModBlocks;
+import com.ohyeah.ohyeahmod.registry.ModItems;
 import com.ohyeah.ohyeahmod.entity.suxia.SuxiaEntity;
+import com.ohyeah.ohyeahmod.entity.suxia.SuxiaProfile;
 import com.ohyeah.ohyeahmod.entity.suxia.SuxiaLuanluanProjectileEntity;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfLayEggGoal;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
@@ -135,6 +138,18 @@ public final class ModGameTests {
         helper.succeed();
     }
 
+    @GameTest(template = TEMPLATE, batch = "ohyeah_food")
+    public static void xiamiHuhuIsFavoriteFoodForAllSpecies(GameTestHelper helper) {
+        ItemStack xiamiHuhu = new ItemStack(ModItems.XIAMI_HUHU.get());
+        ItemStack wheat = new ItemStack(Items.WHEAT);
+
+        helper.assertTrue(BattleFaceProfile.FOODS.isFavorite(xiamiHuhu), "Battle Face should treat Xiami Huhu as favorite food");
+        helper.assertTrue(PinkScarfProfile.FOODS.isFavorite(xiamiHuhu), "Scarf Luo should treat Xiami Huhu as favorite food");
+        helper.assertTrue(SuxiaProfile.FOODS.isFavorite(xiamiHuhu), "Suxia should treat Xiami Huhu as favorite food");
+        helper.assertTrue(BattleFaceProfile.FOODS.isFood(wheat), "Liked food should remain valid for feeding");
+        helper.assertFalse(BattleFaceProfile.FOODS.isFavorite(wheat), "Liked food should not be considered favorite food for tempting");
+        helper.succeed();
+    }
     @GameTest(template = TEMPLATE, batch = "ohyeah_breeding", timeoutTicks = 100)
     public static void pinkScarfCanLayEggInsideFencePen(GameTestHelper helper) {
         for (int y = 1; y <= 2; y++) {
@@ -194,6 +209,11 @@ public final class ModGameTests {
             }
         }
         helper.assertValueEqual(eggCount, 1, "A carrier should lay its Luanluan block inside a fenced pen");
+        helper.assertTrue(
+                helper.getLevel().getBlockEntity(currentEgg) instanceof LuanluanEggBlockEntity eggBlockEntity
+                        && carrier.getUUID().equals(eggBlockEntity.getParentUuid()),
+                "A laid Luanluan block should remember the Tiansuluo that produced it"
+        );
         helper.succeed();
     }
 

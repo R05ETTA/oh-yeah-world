@@ -13,7 +13,7 @@ public final class BattleFaceClientFeedback {
         if (entity.state().hasCarriedEggBlock(entity) && !entity.isBaby() && entity.tickCount % 10 == 0) {
             entity.level().addParticle(ParticleTypes.HEART, entity.getRandomX(0.6D), entity.getRandomY() + 0.5D, entity.getRandomZ(0.6D), 0.0D, 0.02D, 0.0D);
         }
-        ClientSoundManager.playAmbient(entity, ModSoundEvents.TIANSULUO_AMBIENT.get(), BattleFaceProfile.AMBIENT_INTERVAL);
+        ClientSoundManager.playAmbient(entity, ModSoundEvents.TIANSULUO_AMBIENT.get());
     }
 
     public void handleClientEntityEvent(TiansuluoBattleFaceEntity entity, byte status) {
@@ -32,10 +32,20 @@ public final class BattleFaceClientFeedback {
             case BattleFaceProfile.EVENT_EAT_FAVORITE -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_EAT_FAVORITE.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_EAT_FAVORITE, true);
             case BattleFaceProfile.EVENT_ATTACK_END -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_ATTACK_END.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_END, false);
             case BattleFaceProfile.EVENT_HURT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_HURT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_HURT, false);
-            case BattleFaceProfile.EVENT_DEATH -> {
-                ClientSoundManager.stopSound(entity);
-                ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_DEATH.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_DEATH, false);
-            }
+            case BattleFaceProfile.EVENT_DEATH -> ClientSoundManager.playDetachedAction(
+                    entity,
+                    ModSoundEvents.TIANSULUO_DEATH.get(),
+                    SoundSource.NEUTRAL,
+                    ClientSoundManager.PRIORITY_DEATH,
+                    false
+            );
+            case BattleFaceProfile.EVENT_LUANLUAN_BLOCK_BROKEN -> ClientSoundManager.playDetachedAction(
+                    entity,
+                    ModSoundEvents.TIANSULUO_LUANLUAN_BLOCK_BROKEN.get(),
+                    SoundSource.NEUTRAL,
+                    ClientSoundManager.PRIORITY_DEATH,
+                    false
+            );
             case BattleFaceProfile.EVENT_BREED_SUCCESS -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_BREED_SUCCESS.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_BREED_SUCCESS, false);
         }
     }

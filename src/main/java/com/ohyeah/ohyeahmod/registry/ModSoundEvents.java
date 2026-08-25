@@ -8,12 +8,16 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.IntStream;
 public final class ModSoundEvents {
     private static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(Registries.SOUND_EVENT, OhYeah.MODID);
 
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_AMBIENT = register("tiansuluo.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_HURT = register("tiansuluo.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_DEATH = register("tiansuluo.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_LUANLUAN_BLOCK_BROKEN = register("tiansuluo.luanluan_block_broken");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_EAT = register("tiansuluo.eat");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_EAT_FAVORITE = register("tiansuluo.eat_favorite");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_BREED_SUCCESS = register("tiansuluo.breed_success");
@@ -25,9 +29,14 @@ public final class ModSoundEvents {
     /** Shared by both Tiansuluo subspecies when they notice a player for the first time. */
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_NOTICE_PLAYER = register("tiansuluo.notice_player");
 
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_AMBIENT = register("tiansuluo_ps.ambient");
+    public static final int TIANSULUO_PS_AMBIENT_VARIANT_COUNT = 52;
+    public static final List<DeferredHolder<SoundEvent, SoundEvent>> TIANSULUO_PS_AMBIENT_VARIANTS =
+            IntStream.rangeClosed(1, TIANSULUO_PS_AMBIENT_VARIANT_COUNT)
+                    .mapToObj(index -> register(String.format(Locale.ROOT, "tiansuluo_ps.ambient_%02d", index)))
+                    .toList();
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_HURT = register("tiansuluo_ps.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_DEATH = register("tiansuluo_ps.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_LUANLUAN_BLOCK_BROKEN = register("tiansuluo_ps.luanluan_block_broken");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_EAT = register("tiansuluo_ps.eat");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_EAT_FAVORITE = register("tiansuluo_ps.eat_favorite");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIANSULUO_PS_BREED_SUCCESS = register("tiansuluo_ps.breed_success");

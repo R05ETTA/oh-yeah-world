@@ -18,7 +18,7 @@ public final class BattleFaceGoalRegistrar {
         entity.goalSelector.addGoal(1, new BattleFacePounceAttack(entity));
         entity.goalSelector.addGoal(2, new SitWhenOrderedToGoal(entity));
         entity.goalSelector.addGoal(3, new BreedGoal(entity, 1.1D));
-        entity.goalSelector.addGoal(4, new TemptGoal(entity, 1.1D, entity::isFood, false));
+        entity.goalSelector.addGoal(4, new TemptGoal(entity, 1.1D, entity::isFavoriteFood, false));
         entity.goalSelector.addGoal(5, new FollowOwnerGoal(entity, 1.1D, 10.0F, 2.0F));
         entity.goalSelector.addGoal(7, new BattleFaceLayEggGoal(entity, BattleFaceProfile.EGG_LAYING_TICKS));
         entity.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(entity, 1.0D));

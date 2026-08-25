@@ -21,7 +21,7 @@ public final class PinkScarfGoalRegistrar {
         entity.goalSelector.addGoal(5, new TemptGoal(
                 entity,
                 1.1D,
-                stack -> entity.isFood(stack) && !entity.state().hasCarriedEggBlock(entity),
+                stack -> entity.isFavoriteFood(stack) && !entity.state().hasCarriedEggBlock(entity),
                 false
         ));
         entity.goalSelector.addGoal(6, new FollowOwnerGoal(entity, 1.0D, 10.0F, 2.0F));

@@ -1,6 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf;
 
 import com.ohyeah.ohyeahmod.client.sound.ClientSoundManager;
+import com.ohyeah.ohyeahmod.client.sound.PinkScarfAmbientCatalog;
 import com.ohyeah.ohyeahmod.registry.ModSoundEvents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundSource;
@@ -19,7 +20,7 @@ public final class PinkScarfClientFeedback {
                     0.0D
             );
         }
-        ClientSoundManager.playAmbient(entity, ModSoundEvents.TIANSULUO_PS_AMBIENT.get(), PinkScarfProfile.AMBIENT_INTERVAL);
+        ClientSoundManager.playAmbient(entity, PinkScarfAmbientCatalog.get());
     }
 
     /** 服务端实体事件统一进入物种声音管理器。 */
@@ -40,10 +41,20 @@ public final class PinkScarfClientFeedback {
             case PinkScarfProfile.EVENT_ATTACK_SHOT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_SHOT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_SHOT, false);
             case PinkScarfProfile.EVENT_ATTACK_END -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_END.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_END, false);
             case PinkScarfProfile.EVENT_HURT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_HURT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_HURT, false);
-            case PinkScarfProfile.EVENT_DEATH -> {
-                ClientSoundManager.stopSound(entity);
-                ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_DEATH.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_DEATH, false);
-            }
+            case PinkScarfProfile.EVENT_DEATH -> ClientSoundManager.playDetachedAction(
+                    entity,
+                    ModSoundEvents.TIANSULUO_PS_DEATH.get(),
+                    SoundSource.NEUTRAL,
+                    ClientSoundManager.PRIORITY_DEATH,
+                    false
+            );
+            case PinkScarfProfile.EVENT_LUANLUAN_BLOCK_BROKEN -> ClientSoundManager.playDetachedAction(
+                    entity,
+                    ModSoundEvents.TIANSULUO_PS_LUANLUAN_BLOCK_BROKEN.get(),
+                    SoundSource.NEUTRAL,
+                    ClientSoundManager.PRIORITY_DEATH,
+                    false
+            );
             case PinkScarfProfile.EVENT_BREED_SUCCESS -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_BREED_SUCCESS.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_BREED_SUCCESS, false);
             default -> {
             }

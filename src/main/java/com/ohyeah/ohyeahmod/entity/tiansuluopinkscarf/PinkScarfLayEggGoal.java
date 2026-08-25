@@ -1,6 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf;
 
 import com.ohyeah.ohyeahmod.block.LuanluanEggBlock;
+import com.ohyeah.ohyeahmod.block.LuanluanEggBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -205,6 +206,9 @@ public final class PinkScarfLayEggGoal extends MoveToBlockGoal {
             this.entity.state().setEggBlockTargetPos(null);
             this.entity.state().setEggBlockPlacingCounter(0);
             return;
+        }
+        if (level.getBlockEntity(eggPos) instanceof LuanluanEggBlockEntity eggBlockEntity) {
+            eggBlockEntity.setParentUuid(this.entity.getUUID());
         }
 
         level.playSound(null, eggPos, SoundEvents.TURTLE_LAY_EGG, SoundSource.BLOCKS, 0.3F, 0.9F + level.random.nextFloat() * 0.2F);

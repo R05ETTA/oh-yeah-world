@@ -232,6 +232,7 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
                     BattleFaceProfile.EVENT_ATTACK_END,
                     BattleFaceProfile.EVENT_HURT,
                     BattleFaceProfile.EVENT_DEATH,
+                    BattleFaceProfile.EVENT_LUANLUAN_BLOCK_BROKEN,
                     BattleFaceProfile.EVENT_BREED_SUCCESS,
                     BattleFaceProfile.EVENT_NOTICE_PLAYER -> {
                 if (this.level().isClientSide) {
@@ -261,6 +262,10 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
     @Override
     public boolean isFood(ItemStack stack) {
         return BattleFaceProfile.FOODS.isFood(stack);
+    }
+
+    public boolean isFavoriteFood(ItemStack stack) {
+        return BattleFaceProfile.FOODS.isFavorite(stack);
     }
 
     public BattleFaceState state() {

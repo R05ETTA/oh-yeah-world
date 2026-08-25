@@ -1,6 +1,7 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
 import com.ohyeah.ohyeahmod.block.LuanluanEggBlock;
+import com.ohyeah.ohyeahmod.block.LuanluanEggBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -169,6 +170,9 @@ public final class BattleFaceLayEggGoal extends Goal {
         Level level = this.entity.level();
         if (!level.setBlock(pos, eggState, 3)) {
             return;
+        }
+        if (level.getBlockEntity(pos) instanceof LuanluanEggBlockEntity eggBlockEntity) {
+            eggBlockEntity.setParentUuid(this.entity.getUUID());
         }
         level.playSound(null, pos, SoundEvents.TURTLE_LAY_EGG, SoundSource.BLOCKS, 0.3F, 0.9F + level.random.nextFloat() * 0.2F);
         level.gameEvent(GameEvent.BLOCK_PLACE, pos, GameEvent.Context.of(this.entity, eggState));

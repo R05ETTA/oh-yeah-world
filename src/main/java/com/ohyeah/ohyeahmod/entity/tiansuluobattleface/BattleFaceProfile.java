@@ -30,8 +30,6 @@ public final class BattleFaceProfile {
     /** 每次成年个体掉落和繁殖栾栾块的数量范围。 */
     public static final int LUANLUAN_MIN_COUNT = 1;
     public static final int LUANLUAN_MAX_COUNT = 4;
-    /** 环境音最长约 3.48 秒；6 秒尝试间隔保留播放余量。 */
-    public static final int AMBIENT_INTERVAL = 120;
     /** 原生 Animal 繁殖后的父母冷却时间。 */
     public static final int PARENT_BREEDING_COOLDOWN_TICKS = 6000;
     public static final int FOOD_GROWTH_STEP = 6000;
@@ -55,7 +53,7 @@ public final class BattleFaceProfile {
     );
 
     public static final List<String> FOOD_LIKED = List.of("minecraft:wheat", "minecraft:carrot", "minecraft:beetroot", "minecraft:potato");
-    public static final List<String> FOOD_FAVORITE = List.of("ohyeah:chips");
+    public static final List<String> FOOD_FAVORITE = List.of("ohyeah:chips", "ohyeah:xiami_huhu");
     public static final TiansuluoFoods FOODS = new TiansuluoFoods(FOOD_LIKED, FOOD_FAVORITE);
 
     /** 飞扑冷却时间。 */
@@ -97,6 +95,8 @@ public final class BattleFaceProfile {
     public static final byte EVENT_HURT = -94;
     /** 死亡。 */
     public static final byte EVENT_DEATH = -93;
+    /** 玩家破坏该实体产下的栾栾块。 */
+    public static final byte EVENT_LUANLUAN_BLOCK_BROKEN = -89;
     /** 繁殖成功。 */
     public static final byte EVENT_BREED_SUCCESS = -92;
     public static final byte EVENT_NOTICE_PLAYER = -90;

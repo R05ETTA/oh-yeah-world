@@ -202,6 +202,8 @@ var modJar = tasks.named("jar", Jar).flatMap { it.archiveFile }
 var requiredJarResources = [
         "assets/ohyeah/sounds.json",
         "assets/ohyeah/sounds/entity/tiansuluo/notice_player_01.ogg",
+        "assets/ohyeah/sounds/entity/tiansuluo/luanluan_block_broken_01.ogg",
+        "assets/ohyeah/sounds/entity/tiansuluo_pink_scarf/luanluan_block_broken_01.ogg",
         "assets/ohyeah/lang/en_us.json",
         "assets/ohyeah/lang/zh_cn.json",
         "assets/ohyeah/blockstates/tiansuluo_pink_scarf_luanluan_block.json",

@@ -2,6 +2,7 @@ package com.ohyeah.ohyeahmod;
 
 import com.mojang.logging.LogUtils;
 import com.ohyeah.ohyeahmod.registry.ModBlocks;
+import com.ohyeah.ohyeahmod.registry.ModBlockEntities;
 import com.ohyeah.ohyeahmod.registry.ModCreativeModeTabs;
 import com.ohyeah.ohyeahmod.registry.ModEntityTypes;
 import com.ohyeah.ohyeahmod.registry.ModItems;
@@ -19,6 +20,7 @@ public class OhYeah {
 
     public OhYeah(IEventBus modEventBus, ModContainer modContainer) {
         ModBlocks.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
         ModItems.register(modEventBus);
         ModEntityTypes.register(modEventBus);
         ModSoundEvents.register(modEventBus);
