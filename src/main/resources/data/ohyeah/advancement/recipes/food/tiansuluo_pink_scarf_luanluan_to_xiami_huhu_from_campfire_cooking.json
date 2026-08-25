@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_luanluan": {
+      "conditions": {
+        "items": [
+          {
+            "items": "ohyeah:tiansuluo_pink_scarf_egg"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ohyeah:tiansuluo_pink_scarf_luanluan_to_xiami_huhu_from_campfire_cooking"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_luanluan"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ohyeah:tiansuluo_pink_scarf_luanluan_to_xiami_huhu_from_campfire_cooking"
+    ]
+  }
+}

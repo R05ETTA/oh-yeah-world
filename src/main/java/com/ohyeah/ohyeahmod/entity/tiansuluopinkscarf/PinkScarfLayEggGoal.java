@@ -45,10 +45,17 @@ public final class PinkScarfLayEggGoal extends MoveToBlockGoal {
             return false;
         }
 
+        BlockPos currentBase = this.entity.blockPosition().below();
+        if (this.canPlaceEggAt(currentBase)) {
+            this.blockPos = currentBase;
+            return true;
+        }
+
         BlockPos savedTarget = this.entity.state().getEggBlockTargetPos();
         if (savedTarget != null
                 && this.isNearTarget(savedTarget)
-                && this.canPlaceEggAt(savedTarget)) {
+                && this.canPlaceEggAt(savedTarget)
+                && this.canReachEggTarget(savedTarget.above())) {
             this.blockPos = savedTarget;
             return true;
         }
@@ -137,7 +144,9 @@ public final class PinkScarfLayEggGoal extends MoveToBlockGoal {
         int surface = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z) - 1;
         for (int y = surface - 1; y <= surface + 1; y++) {
             BlockPos candidate = new BlockPos(x, y, z);
-            if (this.entity.isWithinRestriction(candidate) && this.canPlaceEggAt(candidate)) {
+            if (this.entity.isWithinRestriction(candidate)
+                    && this.canPlaceEggAt(candidate)
+                    && this.canReachEggTarget(candidate.above())) {
                 this.blockPos = candidate;
                 return true;
             }
@@ -154,6 +163,14 @@ public final class PinkScarfLayEggGoal extends MoveToBlockGoal {
                 && level.isEmptyBlock(eggPos)
                 && level.getFluidState(eggPos).isEmpty()
                 && eggState.canSurvive(level, eggPos);
+    }
+
+    private boolean canReachEggTarget(BlockPos eggPos) {
+        if (eggPos.closerToCenterThan(this.entity.position(), 1.5D)) {
+            return true;
+        }
+        var path = this.entity.getNavigation().createPath(eggPos, 0);
+        return path != null && path.canReach();
     }
 
     private boolean canPlaceEggAt(BlockPos basePos) {
@@ -203,7 +220,7 @@ public final class PinkScarfLayEggGoal extends MoveToBlockGoal {
                         eggPos.getY() + 0.5D,
                         eggPos.getZ() + 0.5D
                 ) <= radiusSquared) {
-                    player.displayClientMessage(message, false);
+                    player.sendSystemMessage(message);
                 }
             }
         }

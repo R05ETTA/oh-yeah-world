@@ -84,6 +84,10 @@ public final class PinkScarfProfile {
     public static final int RETALIATION_MEMORY_TICKS = 1200;
     public static final int ATTACK_DECLARE_TICKS = 40;
     public static final int BURST_SHOTS = 6;
+    /** 骑乘时由玩家攻击触发的短连射数量。 */
+    public static final int RIDER_BURST_SHOTS = 3;
+    /** 骑乘锁定目标时沿用标准远程攻击的抛物线抬升比例。 */
+    public static final double RIDER_ARC_BOOST_PER_BLOCK = 0.2D;
     /** 单发音频约 0.62 秒；14 tick（0.70 秒）让每发声音基本完整后再进入下一发。 */
     public static final int BURST_INTERVAL_TICKS = 14;
     public static final int BURST_COOLDOWN_TICKS = 60;
@@ -96,7 +100,7 @@ public final class PinkScarfProfile {
     public static final float PROJECTILE_INACCURACY = 0.35F;
     /** 统一瞄准目标身体中心，避免固定眼高偏移导致打到脚边。 */
     public static final double PROJECTILE_TARGET_HEIGHT_RATIO = 0.5D;
-    /** 发射口位于实体主体中段，而不是 hitbox 底部。 */
+    /** 发射口位于实体主体中段，保持围巾罗的角色轮廓并与标准攻击一致。 */
     public static final double PROJECTILE_MUZZLE_HEIGHT_RATIO = 0.55D;
     public static final double PROJECTILE_FRONT_OFFSET = 0.12D;
 

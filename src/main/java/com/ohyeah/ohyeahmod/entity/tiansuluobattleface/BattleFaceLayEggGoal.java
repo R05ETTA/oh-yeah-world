@@ -59,7 +59,7 @@ public final class BattleFaceLayEggGoal extends Goal {
 
         this.timeSearching++;
         BlockPos target = this.entity.state().getEggBlockTargetPos();
-        if (target == null || !this.canPlaceEggAt(target)) {
+        if (target == null || !this.canPlaceEggAt(target) || !this.canReachEggTarget(target)) {
             if (this.searchCooldown > 0) {
                 this.searchCooldown--;
             } else {
@@ -84,7 +84,10 @@ public final class BattleFaceLayEggGoal extends Goal {
     private BlockPos findSuitableLayingSpot() {
         Level level = this.entity.level();
         BlockPos center = this.entity.blockPosition();
-
+        if (this.canPlaceEggAt(center)
+                && this.entity.isWithinRestriction(center)) {
+            return center;
+        }
         // 由近到远扫描方形环，优先选择实体脚下或附近的位置。
         for (int radius = 0; radius <= BattleFaceProfile.EGG_SEARCH_RADIUS; radius++) {
             for (int dx = -radius; dx <= radius; dx++) {
@@ -111,11 +114,21 @@ public final class BattleFaceLayEggGoal extends Goal {
         int surface = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z) - 1;
         for (int y = surface - 1; y <= surface + 1; y++) {
             BlockPos eggPos = new BlockPos(x, y + 1, z);
-            if (this.canPlaceEggAt(eggPos) && this.entity.isWithinRestriction(eggPos)) {
+            if (this.canPlaceEggAt(eggPos)
+                    && this.entity.isWithinRestriction(eggPos)
+                    && this.canReachEggTarget(eggPos)) {
                 return eggPos;
             }
         }
         return null;
+    }
+
+    private boolean canReachEggTarget(BlockPos eggPos) {
+        if (eggPos.closerToCenterThan(this.entity.position(), 1.5D)) {
+            return true;
+        }
+        var path = this.entity.getNavigation().createPath(eggPos, 0);
+        return path != null && path.canReach();
     }
 
     private boolean canPlaceEggAt(BlockPos eggPos) {

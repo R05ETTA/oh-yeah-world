@@ -60,9 +60,9 @@ public final class PinkScarfBreedGoal extends BreedGoal {
         level.broadcastEntityEvent(this.animal, (byte) 18);
         level.broadcastEntityEvent(carrier, PinkScarfProfile.EVENT_BREED_SUCCESS);
         if (player != null) {
-            player.displayClientMessage(
+            player.sendSystemMessage(
                     net.minecraft.network.chat.Component.translatable(PinkScarfProfile.getCarriedMessageKey()),
-                    true
+                    false
             );
         }
 

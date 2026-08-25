@@ -29,6 +29,7 @@ bin/
 ### VS Code ###
 .vscode/
 *.cmd
+!run-client.cmd
 
 ### Mac OS ###
 .DS_Store

@@ -79,8 +79,6 @@ public final class BattleFaceBehavior {
                 entity.getNavigation().stop();
                 entity.setTarget(null);
                 entity.level().broadcastEntityEvent(entity, (byte) 7);
-            } else {
-                entity.level().broadcastEntityEvent(entity, (byte) 6);
             }
             entity.level().broadcastEntityEvent(
                     entity,
@@ -136,7 +134,7 @@ public final class BattleFaceBehavior {
             ModAdvancementTracker.award(player, ModAdvancementIds.BREED_TIANSULUO);
             player.awardStat(Stats.ANIMALS_BRED);
             CriteriaTriggers.BRED_ANIMALS.trigger(player, entity, partner, null);
-            player.displayClientMessage(
+            player.sendSystemMessage(
                     Component.translatable(BattleFaceProfile.getCarriedMessageKey()),
                     false
             );

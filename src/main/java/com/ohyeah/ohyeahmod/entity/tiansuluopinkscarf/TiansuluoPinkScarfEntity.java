@@ -14,24 +14,29 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.neoforged.neoforge.common.IShearable;
 import net.neoforged.neoforge.event.EventHooks;
@@ -45,7 +50,7 @@ import java.util.List;
  * <p>实体只保留 Minecraft 生命周期回调和物种入口。食物、繁殖、产卵、剪刀和
  * 远程攻击分别接入原生回调/Goal；不再通过一个 tick 控制器手工驱动整棵行为树。</p>
  */
-public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAttackMob, IShearable {
+public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAttackMob, IShearable, PlayerRideableJumping {
     public static final EntityDataAccessor<Boolean> HAS_CARRIED_EGG_BLOCK =
             SynchedEntityData.defineId(TiansuluoPinkScarfEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> IS_SILENCED =
@@ -62,6 +67,10 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
     private int retaliationBurstShotsFired;
     private int retaliationBurstCooldownTicks;
     private boolean wasBabyLastTick;
+    private int riderBurstShotsRemaining;
+    private int riderBurstNextShotTick;
+    private int riderBurstCooldownTicks;
+    private @Nullable LivingEntity riderBurstTarget;
 
     public TiansuluoPinkScarfEntity(EntityType<? extends TiansuluoPinkScarfEntity> entityType, Level level) {
         super(entityType, level);
@@ -119,6 +128,7 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         this.tickPlayerNotice();
 
         this.tickRetaliationWindow();
+        this.tickRiderBurst();
         if (this.wasBabyLastTick && !this.isBaby()) {
             this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_GROW_UP);
         }
@@ -131,7 +141,8 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         if (hurt && !this.level().isClientSide && this.isAlive()) {
             this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_HURT);
         }
-        if (hurt && !this.level().isClientSide && source.getEntity() instanceof LivingEntity attacker) {
+        if (hurt && !this.level().isClientSide && !this.isRiddenByOwner()
+                && source.getEntity() instanceof LivingEntity attacker) {
             if (this.canRetaliateAgainst(attacker)) {
                 this.beginRetaliation(attacker);
             }
@@ -145,27 +156,206 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
             return;
         }
 
-        Vec3Muzzle muzzle = this.getProjectileMuzzle();
+        Vec3 targetAim = new Vec3(
+                target.getX() - this.getX(),
+                target.getY() + target.getBbHeight() * PinkScarfProfile.PROJECTILE_TARGET_HEIGHT_RATIO - this.getY(),
+                target.getZ() - this.getZ()
+        );
+        Vec3Muzzle muzzle = this.getProjectileMuzzle(targetAim);
         double deltaX = target.getX() - muzzle.x;
         double deltaY = target.getY() + target.getBbHeight() * PinkScarfProfile.PROJECTILE_TARGET_HEIGHT_RATIO - muzzle.y;
         double deltaZ = target.getZ() - muzzle.z;
         double arcBoost = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ) * 0.2D;
-
-        PinkScarfProjectileEntity projectile = new PinkScarfProjectileEntity(this.level(), this);
-        projectile.setDamage((float) PinkScarfProfile.PROJECTILE_DAMAGE);
-        projectile.setPos(muzzle.x, muzzle.y, muzzle.z);
-        projectile.shoot(
-                deltaX,
-                deltaY + arcBoost,
-                deltaZ,
-                PinkScarfProfile.PROJECTILE_SPEED,
-                PinkScarfProfile.PROJECTILE_INACCURACY
+        this.fireProjectile(
+                muzzle,
+                new Vec3(deltaX, deltaY + arcBoost, deltaZ),
+                true,
+                PinkScarfProfile.PROJECTILE_INACCURACY,
+                false
         );
-        this.level().addFreshEntity(projectile);
-        this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_ATTACK_SHOT);
         this.retaliationBurstShotsFired++;
         if (this.retaliationBurstShotsFired >= PinkScarfProfile.BURST_SHOTS) {
             this.retaliationBurstCooldownTicks = PinkScarfProfile.BURST_COOLDOWN_TICKS;
+        }
+    }
+
+
+    @Override
+    protected boolean canAddPassenger(Entity passenger) {
+        return !this.isBaby()
+                && this.isTame()
+                && passenger instanceof Player player
+                && this.isOwnedBy(player)
+                && !this.isVehicle();
+    }
+
+    @Override
+    public LivingEntity getControllingPassenger() {
+        Entity passenger = this.getFirstPassenger();
+        return passenger instanceof Player player && this.isOwnedBy(player) ? player : null;
+    }
+
+    @Override
+    public Vec3 getPassengerRidingPosition(Entity passenger) {
+        return new Vec3(this.getX(), this.getY() + this.getBbHeight() * 0.9D, this.getZ());
+    }
+
+    @Override
+    protected void tickRidden(Player rider, Vec3 input) {
+        super.tickRidden(rider, input);
+        this.setRot(rider.getYRot(), rider.getXRot() * 0.5F);
+        this.yRotO = this.getYRot();
+        this.yHeadRot = this.getYRot();
+        this.yBodyRot = this.getYRot();
+    }
+    @Override
+    protected Vec3 getRiddenInput(Player rider, Vec3 input) {
+        float strafe = rider.xxa * 0.5F;
+        float forward = rider.zza;
+        if (forward <= 0.0F) {
+            forward *= 0.25F;
+        }
+        return new Vec3(strafe, 0.0D, forward);
+    }
+
+    @Override
+    protected float getRiddenSpeed(Player rider) {
+        return (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+    }
+
+    @Override
+    public void onPlayerJump(int jumpStrength) {
+        if (!this.canJump()) {
+            return;
+        }
+        float charge = Mth.clamp(jumpStrength, 0, 90) / 90.0F;
+        double jumpVelocity = 0.42D + 0.4D * charge;
+        Vec3 movement = this.getDeltaMovement();
+        this.setDeltaMovement(movement.x, jumpVelocity, movement.z);
+        this.hasImpulse = true;
+    }
+
+    @Override
+    public boolean canJump() {
+        return this.isRiddenByOwner();
+    }
+
+    @Override
+    public void handleStartJump(int jumpStrength) {
+    }
+
+    @Override
+    public void handleStopJump() {
+    }
+
+
+    public boolean isRiddenByOwner() {
+        return this.getControllingPassenger() != null;
+    }
+
+    public boolean tryStartRiderBurst(Player rider, Entity targetEntity) {
+        if (!(targetEntity instanceof LivingEntity target)
+                || target == this
+                || (target instanceof TamableAnimal tame && tame.isOwnedBy(rider))
+                || !target.isAlive()
+                || this.level().isClientSide
+                || this.isBaby()
+                || !this.isTame()
+                || !this.isOwnedBy(rider)
+                || this.getFirstPassenger() != rider
+                || this.riderBurstShotsRemaining > 0
+                || this.riderBurstCooldownTicks > 0) {
+            return false;
+        }
+
+        this.riderBurstTarget = target;
+        this.riderBurstShotsRemaining = PinkScarfProfile.RIDER_BURST_SHOTS;
+        this.riderBurstNextShotTick = this.tickCount;
+        this.fireMountedBurstShot();
+        if (rider instanceof ServerPlayer serverPlayer) {
+            ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.RIDER_ATTACK);
+        }
+        return true;
+    }
+
+    private void tickRiderBurst() {
+        if (this.riderBurstCooldownTicks > 0) {
+            this.riderBurstCooldownTicks--;
+        }
+        if (this.riderBurstShotsRemaining <= 0) {
+            return;
+        }
+        if (!this.isRiddenByOwner()
+                || this.riderBurstTarget == null
+                || !this.riderBurstTarget.isAlive()) {
+            this.riderBurstShotsRemaining = 0;
+            this.riderBurstNextShotTick = 0;
+            this.riderBurstTarget = null;
+            this.riderBurstCooldownTicks = PinkScarfProfile.BURST_COOLDOWN_TICKS;
+            return;
+        }
+        if (this.tickCount < this.riderBurstNextShotTick) {
+            return;
+        }
+        this.fireMountedBurstShot();
+    }
+
+    private void fireMountedBurstShot() {
+        if (this.riderBurstShotsRemaining <= 0 || this.riderBurstTarget == null) {
+            return;
+        }
+        LivingEntity target = this.riderBurstTarget;
+        Vec3 targetAim = new Vec3(
+                target.getX() - this.getX(),
+                target.getY() + target.getBbHeight() * PinkScarfProfile.PROJECTILE_TARGET_HEIGHT_RATIO - this.getY(),
+                target.getZ() - this.getZ()
+        );
+        Vec3Muzzle muzzle = this.getProjectileMuzzle(targetAim);
+        double deltaX = target.getX() - muzzle.x;
+        double deltaY = target.getY() + target.getBbHeight() * PinkScarfProfile.PROJECTILE_TARGET_HEIGHT_RATIO - muzzle.y;
+        double deltaZ = target.getZ() - muzzle.z;
+        double horizontalDistance = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+        double arcBoost = horizontalDistance * PinkScarfProfile.RIDER_ARC_BOOST_PER_BLOCK;
+        this.fireProjectile(
+                muzzle,
+                new Vec3(deltaX, deltaY + arcBoost, deltaZ),
+                true,
+                0.0F,
+                false
+        );
+        this.riderBurstShotsRemaining--;
+        if (this.riderBurstShotsRemaining > 0) {
+            this.riderBurstNextShotTick = this.tickCount + PinkScarfProfile.BURST_INTERVAL_TICKS;
+        } else {
+            this.riderBurstTarget = null;
+            this.riderBurstCooldownTicks = PinkScarfProfile.BURST_COOLDOWN_TICKS;
+        }
+    }
+
+    private void fireProjectile(
+            Vec3Muzzle muzzle,
+            Vec3 direction,
+            boolean playSound,
+            float inaccuracy,
+            boolean noGravity
+    ) {
+        if (this.level().isClientSide || direction.lengthSqr() < 1.0E-6D) {
+            return;
+        }
+        PinkScarfProjectileEntity projectile = new PinkScarfProjectileEntity(this.level(), this);
+        projectile.setDamage((float) PinkScarfProfile.PROJECTILE_DAMAGE);
+        projectile.setPos(muzzle.x, muzzle.y, muzzle.z);
+        projectile.setNoGravity(noGravity);
+        projectile.shoot(
+                direction.x,
+                direction.y,
+                direction.z,
+                PinkScarfProfile.PROJECTILE_SPEED,
+                inaccuracy
+        );
+        this.level().addFreshEntity(projectile);
+        if (playSound) {
+            this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_ATTACK_SHOT);
         }
     }
 
@@ -221,15 +411,12 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         ItemStack stack = player.getItemInHand(hand);
         boolean favorite = PinkScarfProfile.FOODS.isFavorite(stack);
 
-        if (this.isTame() && this.isOwnedBy(player) && stack.isEmpty()) {
+        if (this.isTame() && this.isOwnedBy(player) && !this.isBaby() && stack.isEmpty()) {
             if (!this.level().isClientSide) {
-                boolean sit = !this.isOrderedToSit();
-                this.setOrderedToSit(sit);
-                if (sit) {
-                    this.getNavigation().stop();
-                    if (player instanceof ServerPlayer serverPlayer) {
-                        ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.SIT_COMPANION);
-                    }
+                this.setOrderedToSit(false);
+                this.finishRetaliation();
+                if (player.startRiding(this) && player instanceof ServerPlayer serverPlayer) {
+                    ModAdvancementTracker.award(serverPlayer, ModAdvancementIds.RIDE_SCARF_LUO);
                 }
             }
             return InteractionResult.sidedSuccess(this.level().isClientSide);
@@ -323,8 +510,6 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
             this.getNavigation().stop();
             this.setTarget(null);
             this.level().broadcastEntityEvent(this, (byte) 7);
-        } else {
-            this.level().broadcastEntityEvent(this, (byte) 6);
         }
     }
 
@@ -475,8 +660,13 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         }
     }
 
-    private Vec3Muzzle getProjectileMuzzle() {
-        net.minecraft.world.phys.Vec3 forward = net.minecraft.world.phys.Vec3.directionFromRotation(0.0F, this.getYHeadRot()).normalize();
+    private Vec3Muzzle getProjectileMuzzle(Vec3 direction) {
+        Vec3 forward = new Vec3(direction.x, 0.0D, direction.z);
+        if (forward.lengthSqr() < 1.0E-6D) {
+            forward = Vec3.directionFromRotation(0.0F, this.getYHeadRot());
+        } else {
+            forward = forward.normalize();
+        }
         double horizontalOffset = this.getBbWidth() * 0.5D + PinkScarfProfile.PROJECTILE_FRONT_OFFSET;
         return new Vec3Muzzle(
                 this.getX() + forward.x * horizontalOffset,

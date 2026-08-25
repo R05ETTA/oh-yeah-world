@@ -1,5 +1,6 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
+import com.ohyeah.ohyeahmod.ModEvents;
 import com.ohyeah.ohyeahmod.OhYeah;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementIds;
 import com.ohyeah.ohyeahmod.advancement.ModAdvancementTracker;
@@ -7,12 +8,16 @@ import com.ohyeah.ohyeahmod.block.LuanluanEggBlock;
 import com.ohyeah.ohyeahmod.registry.ModBlocks;
 import com.ohyeah.ohyeahmod.entity.suxia.SuxiaEntity;
 import com.ohyeah.ohyeahmod.entity.suxia.SuxiaLuanluanProjectileEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfLayEggGoal;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
+import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProjectileEntity;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.TiansuluoPinkScarfEntity;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.spawn.TiansuluoPinkScarfBedWakeSpawner;
 import com.ohyeah.ohyeahmod.registry.ModEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +26,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -36,7 +42,7 @@ public final class ModGameTests {
 
     @SuppressWarnings("removal")
     @GameTest(template = TEMPLATE, batch = "ohyeah_sitting")
-    public static void ownerCanToggleSitting(GameTestHelper helper) {
+    public static void ownerCanRidePinkAndToggleBattleFaceSitting(GameTestHelper helper) {
         var owner = helper.makeMockServerPlayerInLevel();
         owner.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 
@@ -48,11 +54,16 @@ public final class ModGameTests {
         helper.assertFalse(pinkScarf.shouldTryTeleportToOwner(), "Scarf Luo should never use automatic owner teleport");
         helper.assertTrue(
                 pinkScarf.mobInteract(owner, InteractionHand.MAIN_HAND).consumesAction(),
-                "Owner empty-hand interaction should be consumed for Scarf Luo"
+                "Owner empty-hand interaction should be consumed for Scarf Luo riding"
         );
-        helper.assertTrue(pinkScarf.isOrderedToSit(), "Scarf Luo should be ordered to sit");
-        pinkScarf.mobInteract(owner, InteractionHand.MAIN_HAND);
-        helper.assertFalse(pinkScarf.isOrderedToSit(), "Second interaction should order Scarf Luo to stand");
+        helper.assertTrue(owner.getVehicle() == pinkScarf, "The owner should ride an adult tamed Scarf Luo");
+        var rideAdvancement = owner.getServer().getAdvancements()
+                .get(ModAdvancementIds.id(ModAdvancementIds.RIDE_SCARF_LUO));
+        helper.assertTrue(
+                owner.getAdvancements().getOrStartProgress(rideAdvancement).isDone(),
+                "Riding the Scarf Luo should award the riding advancement"
+        );
+        owner.stopRiding();
 
         TiansuluoBattleFaceEntity battleFace = helper.spawn(
                 ModEntityTypes.TIANSULUO_BATTLE_FACE.get(),
@@ -124,6 +135,68 @@ public final class ModGameTests {
         helper.succeed();
     }
 
+    @GameTest(template = TEMPLATE, batch = "ohyeah_breeding", timeoutTicks = 100)
+    public static void pinkScarfCanLayEggInsideFencePen(GameTestHelper helper) {
+        for (int y = 1; y <= 2; y++) {
+            for (int x = 1; x <= 5; x++) {
+                helper.setBlock(new BlockPos(x, y, 1), Blocks.OAK_FENCE);
+                helper.setBlock(new BlockPos(x, y, 5), Blocks.OAK_FENCE);
+            }
+            for (int z = 2; z <= 4; z++) {
+                helper.setBlock(new BlockPos(1, y, z), Blocks.OAK_FENCE);
+                helper.setBlock(new BlockPos(5, y, z), Blocks.OAK_FENCE);
+            }
+        }
+        for (int x = 2; x <= 4; x++) {
+            for (int z = 2; z <= 4; z++) {
+                helper.setBlock(new BlockPos(x, 0, z), Blocks.GRASS_BLOCK);
+            }
+        }
+        for (int x = 2; x <= 4; x++) {
+            for (int z = 2; z <= 4; z++) {
+                helper.setBlock(new BlockPos(x, 1, z), Blocks.AIR);
+            }
+        }
+
+
+        TiansuluoPinkScarfEntity carrier = helper.spawn(
+                ModEntityTypes.TIANSULUO_PINK_SCARF.get(),
+                new BlockPos(3, 1, 3)
+        );
+        carrier.state().setHasCarriedEggBlock(carrier, true);
+        carrier.state().setCarriedEggCount(1);
+        BlockPos currentBase = carrier.blockPosition().below();
+        BlockPos currentEgg = carrier.blockPosition();
+        helper.assertTrue(
+                helper.getLevel().getBlockState(currentBase).isFaceSturdy(helper.getLevel(), currentBase, net.minecraft.core.Direction.UP),
+                "The carrier base should be sturdy: " + currentBase
+        );
+        helper.assertTrue(helper.getLevel().isEmptyBlock(currentEgg), "The carrier egg position should be empty: " + currentEgg);
+        helper.assertTrue(
+                ModBlocks.TIANSULUO_PINK_SCARF_LUANLUAN_BLOCK.get().defaultBlockState()
+                        .canSurvive(helper.getLevel(), currentEgg),
+                "The Luanluan block should survive at: " + currentEgg
+        );
+        PinkScarfLayEggGoal goal = new PinkScarfLayEggGoal(carrier, 1);
+        helper.assertTrue(goal.canUse(), "The carrier should find a reachable laying spot inside the pen");
+        goal.start();
+        goal.tick();
+
+        var eggBlock = ModBlocks.TIANSULUO_PINK_SCARF_LUANLUAN_BLOCK.get();
+        int eggCount = 0;
+        for (int x = 2; x <= 4; x++) {
+            for (int y = 1; y <= 2; y++) {
+                for (int z = 2; z <= 4; z++) {
+                    if (helper.getBlockState(new BlockPos(x, y, z)).is(eggBlock)) {
+                        eggCount++;
+                    }
+                }
+            }
+        }
+        helper.assertValueEqual(eggCount, 1, "A carrier should lay its Luanluan block inside a fenced pen");
+        helper.succeed();
+    }
+
     @GameTest(template = TEMPLATE, batch = "ohyeah_egg", timeoutTicks = 700)
     public static void luanluanBlockHatchesOnSchedule(GameTestHelper helper) {
         BlockPos eggPos = new BlockPos(2, 1, 2);
@@ -180,6 +253,58 @@ public final class ModGameTests {
             helper.assertValueEqual(projectileCount, 1, "Suxia should fire one Luanluan on death");
             helper.succeed();
         });
+    }
+
+    @GameTest(template = TEMPLATE, batch = "ohyeah_riding")
+    public static void riddenPinkLocksAttackedTarget(GameTestHelper helper) {
+        var owner = helper.makeMockServerPlayerInLevel();
+        TiansuluoPinkScarfEntity pinkScarf = helper.spawn(
+                ModEntityTypes.TIANSULUO_PINK_SCARF.get(),
+                new BlockPos(2, 1, 2)
+        );
+        pinkScarf.tame(owner);
+        owner.setYRot(0.0F);
+        owner.setXRot(0.0F);
+        helper.assertTrue(owner.startRiding(pinkScarf), "The owner should be able to ride the Scarf Luo");
+        pinkScarf.setOnGround(true);
+        helper.assertTrue(pinkScarf.canJump(), "A ridden Scarf Luo should be able to jump from the ground");
+        pinkScarf.onPlayerJump(90);
+        helper.assertTrue(pinkScarf.getDeltaMovement().y > 0.8D, "A charged rider jump should add vertical velocity");
+
+        var target = helper.spawn(EntityType.COW, new BlockPos(7, 1, 2));
+        Vec3 targetDirection = new Vec3(
+                target.getX() - pinkScarf.getX(),
+                target.getY() + target.getBbHeight() * PinkScarfProfile.PROJECTILE_TARGET_HEIGHT_RATIO
+                        - (pinkScarf.getY() + pinkScarf.getBbHeight() * PinkScarfProfile.PROJECTILE_MUZZLE_HEIGHT_RATIO),
+                target.getZ() - pinkScarf.getZ()
+        ).normalize();
+        ModEvents.onPlayerAttack(new AttackEntityEvent(owner, target));
+        var riderAttackAdvancement = owner.getServer().getAdvancements()
+                .get(ModAdvancementIds.id(ModAdvancementIds.RIDER_ATTACK));
+        helper.assertTrue(
+                owner.getAdvancements().getOrStartProgress(riderAttackAdvancement).isDone(),
+                "A ridden burst should award the rider attack advancement"
+        );
+
+        int projectileCount = helper.getLevel().getEntitiesOfClass(
+                PinkScarfProjectileEntity.class,
+                new AABB(helper.absolutePos(new BlockPos(2, 1, 2))).inflate(12.0D)
+        ).size();
+        helper.assertValueEqual(projectileCount, 1, "Riding attack should fire the first projectile immediately");
+        PinkScarfProjectileEntity projectile = helper.getLevel().getEntitiesOfClass(
+                PinkScarfProjectileEntity.class,
+                new AABB(helper.absolutePos(new BlockPos(2, 1, 2))).inflate(12.0D)
+        ).get(0);
+        helper.assertTrue(
+                Math.abs(projectile.getY() - (pinkScarf.getY() + pinkScarf.getBbHeight() * PinkScarfProfile.PROJECTILE_MUZZLE_HEIGHT_RATIO)) < 0.01D,
+                "The riding projectile should use the Scarf Luo muzzle height"
+        );
+        helper.assertTrue(
+                projectile.getDeltaMovement().normalize().dot(targetDirection) > 0.75D,
+                "The riding projectile should lock onto the attacked target"
+        );
+        helper.assertTrue(pinkScarf.getTarget() == null, "Riding attack should not set a Scarf Luo AI target");
+        helper.succeed();
     }
 
     @GameTest(template = TEMPLATE)

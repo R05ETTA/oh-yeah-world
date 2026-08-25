@@ -17,7 +17,9 @@ public final class PinkScarfOwnerHurtTargetGoal extends OwnerHurtTargetGoal {
 
     @Override
     public boolean canUse() {
-        return !this.pinkScarf.isRetaliating() && super.canUse();
+        return !this.pinkScarf.isRiddenByOwner()
+                && !this.pinkScarf.isRetaliating()
+                && super.canUse();
     }
 
     @Override

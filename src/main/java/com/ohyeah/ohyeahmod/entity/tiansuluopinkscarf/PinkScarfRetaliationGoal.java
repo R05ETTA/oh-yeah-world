@@ -24,13 +24,16 @@ public final class PinkScarfRetaliationGoal extends RangedAttackGoal {
 
     @Override
     public boolean canUse() {
-        return this.pinkScarf.isRetaliating() && super.canUse();
+        return !this.pinkScarf.isRiddenByOwner()
+                && this.pinkScarf.isRetaliating()
+                && super.canUse();
     }
 
     @Override
     public boolean canContinueToUse() {
         LivingEntity target = this.pinkScarf.getTarget();
-        return this.pinkScarf.isRetaliating()
+        return !this.pinkScarf.isRiddenByOwner()
+                && this.pinkScarf.isRetaliating()
                 && target != null
                 && target.isAlive()
                 && this.pinkScarf.distanceToSqr(target)

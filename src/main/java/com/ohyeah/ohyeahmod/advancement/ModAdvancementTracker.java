@@ -40,9 +40,9 @@ public final class ModAdvancementTracker {
         boolean wasComplete = player.getAdvancements().getOrStartProgress(collection).isDone();
         award(player, ModAdvancementIds.COLLECT_SPECIES, collectionCriterion);
         if (!wasComplete && player.getAdvancements().getOrStartProgress(collection).isDone()) {
-            player.displayClientMessage(
+            player.sendSystemMessage(
                     Component.translatable("message.ohyeah.collect_species_complete"),
-                    true
+                    false
             );
         }
     }

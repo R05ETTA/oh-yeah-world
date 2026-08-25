@@ -51,7 +51,9 @@ public final class ModAdvancementProvider implements AdvancementProvider.Advance
         AdvancementHolder meetBattle = saveTask(saver, existingFileHelper, root, ModAdvancementIds.MEET_BATTLE_FACE, ModItems.TIANSULUO_BATTLE_FACE_EGG.get());
         AdvancementHolder meetSuxia = saveTask(saver, existingFileHelper, root, ModAdvancementIds.MEET_SUXIA, ModItems.SUXIA_EGG.get());
         saveTask(saver, existingFileHelper, root, ModAdvancementIds.FEED_GROW, Items.WHEAT);
-        saveTask(saver, existingFileHelper, meetScarf, ModAdvancementIds.TAME_SCARF_LUO, ModItems.CHIPS.get());
+        AdvancementHolder tameScarf = saveTask(saver, existingFileHelper, meetScarf, ModAdvancementIds.TAME_SCARF_LUO, ModItems.CHIPS.get());
+        AdvancementHolder rideScarf = saveTask(saver, existingFileHelper, tameScarf, ModAdvancementIds.RIDE_SCARF_LUO, ModItems.TIANSULUO_PINK_SCARF_EGG.get());
+        saveTask(saver, existingFileHelper, rideScarf, ModAdvancementIds.RIDER_ATTACK, ModItems.TIANSULUO_PINK_SCARF_EGG.get());
         saveTask(saver, existingFileHelper, meetBattle, ModAdvancementIds.TAME_BATTLE_FACE, ModItems.CHIPS.get());
         saveTask(saver, existingFileHelper, root, ModAdvancementIds.OWNER_COMBAT, ModItems.CHIPS.get());
         saveTask(saver, existingFileHelper, root, ModAdvancementIds.SIT_COMPANION, Items.LEAD);

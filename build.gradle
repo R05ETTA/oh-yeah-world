@@ -210,7 +210,17 @@ var requiredJarResources = [
         "data/ohyeah/neoforge/biome_modifier/suxia_spawn.json",
         "data/ohyeah/structure/empty.nbt",
         "data/ohyeah/recipe/tiansuluo_pink_scarf_luanluan_to_xiami_huhu.json",
+        "data/ohyeah/recipe/tiansuluo_pink_scarf_luanluan_to_xiami_huhu_from_smelting.json",
+        "data/ohyeah/recipe/tiansuluo_pink_scarf_luanluan_to_xiami_huhu_from_campfire_cooking.json",
         "data/ohyeah/recipe/tiansuluo_battle_face_luanluan_to_xiami_huhu.json",
+        "data/ohyeah/recipe/tiansuluo_battle_face_luanluan_to_xiami_huhu_from_smelting.json",
+        "data/ohyeah/recipe/tiansuluo_battle_face_luanluan_to_xiami_huhu_from_campfire_cooking.json",
+        "data/ohyeah/advancement/recipes/food/tiansuluo_pink_scarf_luanluan_to_xiami_huhu.json",
+        "data/ohyeah/advancement/recipes/food/tiansuluo_pink_scarf_luanluan_to_xiami_huhu_from_smelting.json",
+        "data/ohyeah/advancement/recipes/food/tiansuluo_pink_scarf_luanluan_to_xiami_huhu_from_campfire_cooking.json",
+        "data/ohyeah/advancement/recipes/food/tiansuluo_battle_face_luanluan_to_xiami_huhu.json",
+        "data/ohyeah/advancement/recipes/food/tiansuluo_battle_face_luanluan_to_xiami_huhu_from_smelting.json",
+        "data/ohyeah/advancement/recipes/food/tiansuluo_battle_face_luanluan_to_xiami_huhu_from_campfire_cooking.json",
 ]
 
 var verifyJarResources = tasks.register("verifyJarResources") {
