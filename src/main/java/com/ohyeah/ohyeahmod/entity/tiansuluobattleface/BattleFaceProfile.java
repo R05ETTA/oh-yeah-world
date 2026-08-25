@@ -45,7 +45,14 @@ public final class BattleFaceProfile {
     public static final int SPAWN_WEIGHT = 1;
     public static final int SPAWN_MIN_GROUP = 1;
     public static final int SPAWN_MAX_GROUP = 1;
-    public static final List<String> SPAWN_BIOMES = List.of("minecraft:plains", "minecraft:meadow");
+    /** 平原、平原变体、草甸以及原版热带草原 Tag 覆盖的开阔草原群系。 */
+    public static final List<String> SPAWN_BIOMES = List.of(
+            "minecraft:plains",
+            "minecraft:sunflower_plains",
+            "minecraft:snowy_plains",
+            "minecraft:meadow",
+            "#minecraft:is_savanna"
+    );
 
     public static final List<String> FOOD_LIKED = List.of("minecraft:wheat", "minecraft:carrot", "minecraft:beetroot", "minecraft:potato");
     public static final List<String> FOOD_FAVORITE = List.of("ohyeah:chips");
