@@ -99,8 +99,8 @@ public final class PinkScarfProfile {
     public static final float PROJECTILE_INACCURACY = 0.35F;
     /** 统一瞄准目标身体中心，避免固定眼高偏移导致打到脚边。 */
     public static final double PROJECTILE_TARGET_HEIGHT_RATIO = 0.5D;
-    /** 发射口位于实体主体中段，保持围巾罗的角色轮廓并与标准攻击一致。 */
-    public static final double PROJECTILE_MUZZLE_HEIGHT_RATIO = 0.55D;
+    /** 发射口下移到实体高度的 30%，成年体约 0.51 格，幼体约 0.255 格。 */
+    public static final double PROJECTILE_MUZZLE_HEIGHT_RATIO = 0.30D;
     public static final double PROJECTILE_FRONT_OFFSET = 0.12D;
 
     /** 这些事件只用于客户端动作反馈，服务端行为不依赖事件本身。 */
