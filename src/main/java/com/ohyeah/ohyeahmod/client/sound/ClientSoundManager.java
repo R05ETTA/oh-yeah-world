@@ -313,8 +313,16 @@ public final class ClientSoundManager {
 
     private static void stopPrimarySound(LivingEntity entity, Minecraft mc) {
         ActiveSound active = ACTIVE_SOUNDS.remove(entity.getId());
-        if (active != null) {
-            mc.getSoundManager().stop(active.instance());
+        if (active == null) {
+            return;
+        }
+        mc.getSoundManager().stop(active.instance());
+        VoiceState state = VOICE_STATES.get(entity.getId());
+        if (state != null) {
+            long gameTime = mc.level == null ? 0L : mc.level.getGameTime();
+            state.nextAmbientTick = gameTime + (active.kind() == SoundKind.AMBIENT
+                    ? state.scaledDelay(AMBIENT_REST_MIN, AMBIENT_REST_MAX)
+                    : state.scaledDelay(ACTION_REST_MIN, ACTION_REST_MAX));
         }
     }
 

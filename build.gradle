@@ -198,6 +198,113 @@ tasks.named("runGameTestServer") {
     mustRunAfter tasks.named("build")
 }
 
+var soundModId = mod_id.toString()
+var soundDefinitions = layout.projectDirectory.file("src/generated/resources/assets/${soundModId}/sounds.json")
+var soundAssets = layout.projectDirectory.dir("src/main/resources/assets/${mod_id}/sounds")
+var soundLang = layout.projectDirectory.dir("src/generated/resources/assets/${mod_id}/lang")
+var ambientRegistrySource = layout.projectDirectory.file("src/main/java/com/ohyeah/ohyeahmod/registry/ModSoundEvents.java")
+def soundDefinitionsFile = soundDefinitions.asFile
+def soundAssetsRoot = soundAssets.asFile
+def soundLangRoot = soundLang.asFile
+def ambientRegistryFile = ambientRegistrySource.asFile
+def soundAssetFiles = fileTree(soundAssetsRoot).matching {
+    include "**/*.ogg"
+}
+var verifySoundAssets = tasks.register("verifySoundAssets") {
+    group = "verification"
+    description = "Verifies sound definitions, subtitles, and OGG asset bindings."
+    dependsOn tasks.named("runData")
+    inputs.file(soundDefinitions)
+    inputs.dir(soundAssets)
+    inputs.files(soundLang.file("en_us.json"), soundLang.file("zh_cn.json"), ambientRegistrySource)
+
+    doLast {
+        if (!soundDefinitionsFile.isFile()) {
+            throw new GradleException("Missing generated sound definitions: ${soundDefinitionsFile}")
+        }
+
+        def parser = new groovy.json.JsonSlurper()
+        def definitions = parser.parse(soundDefinitionsFile)
+        def errors = []
+        def referencedAssets = new LinkedHashSet<String>()
+        def subtitleKeys = new LinkedHashSet<String>()
+
+        definitions.each { eventId, definition ->
+            if (!(definition instanceof Map)) {
+                errors.add("Sound event '${eventId}' does not contain an object definition")
+                return
+            }
+            def entries = definition.sounds
+            if (!(entries instanceof List) || entries.isEmpty()) {
+                errors.add("Sound event '${eventId}' has no sound entries")
+                return
+            }
+            if (definition.subtitle != null) {
+                subtitleKeys.add(definition.subtitle.toString())
+            }
+
+            entries.eachWithIndex { entry, index ->
+                def name = entry instanceof Map ? entry.name?.toString() : entry?.toString()
+                if (name == null || name.isBlank()) {
+                    errors.add("Sound event '${eventId}' entry ${index} has no name")
+                    return
+                }
+                if (name.startsWith("${soundModId}:")) {
+                    def relativePath = name.substring(soundModId.length() + 1) + ".ogg"
+                    referencedAssets.add(relativePath)
+                    def asset = new File(soundAssetsRoot, relativePath.replace('/', File.separator))
+                    if (!asset.isFile()) {
+                        errors.add("Sound event '${eventId}' references missing OGG '${relativePath}'")
+                    }
+                }
+            }
+        }
+
+        def actualAssets = soundAssetFiles.files.collect { asset ->
+            soundAssetsRoot.toPath().relativize(asset.toPath()).toString().replace(File.separatorChar, '/' as char)
+        } as Set
+        actualAssets.findAll { !referencedAssets.contains(it) }.sort().each { relativePath ->
+            errors.add("Unreferenced OGG asset '${relativePath}'")
+        }
+
+        ["en_us", "zh_cn"].each { locale ->
+            def languageFile = new File(soundLangRoot, "${locale}.json")
+            if (!languageFile.isFile()) {
+                errors.add("Missing generated language file '${languageFile}'")
+                return
+            }
+            def language = parser.parse(languageFile)
+            subtitleKeys.findAll { !language.containsKey(it) }.sort().each { subtitle ->
+                errors.add("Missing ${locale} subtitle '${subtitle}'")
+            }
+        }
+
+        def ambientPrefix = "tiansuluo_ps.ambient_"
+        def ambientKeys = definitions.keySet().findAll { key ->
+            key.startsWith(ambientPrefix) && key.substring(ambientPrefix.length()) ==~ /\d{2}/
+        }.sort()
+        if (!ambientKeys.isEmpty()) {
+            def numbers = ambientKeys.collect { key -> key.substring(ambientPrefix.length()).toInteger() }
+            def expectedKeys = (1..numbers.size()).collect { index ->
+                String.format(java.util.Locale.ROOT, "${ambientPrefix}%02d", index)
+            }
+            if (ambientKeys != expectedKeys) {
+                errors.add("Pink Scarf ambient event IDs must be consecutive from 01: ${ambientKeys}")
+            }
+        }
+
+        def variantMatcher = ambientRegistryFile.text =~ /TIANSULUO_PS_AMBIENT_VARIANT_COUNT\s*=\s*(\d+)/
+        if (variantMatcher.find() && ambientKeys.size() != variantMatcher.group(1).toInteger()) {
+            errors.add("Generated Pink Scarf ambient event count ${ambientKeys.size()} differs from registry count ${variantMatcher.group(1)}")
+        }
+
+        if (!errors.isEmpty()) {
+            throw new GradleException("Sound asset verification failed:\n - ${errors.join('\n - ')}")
+        }
+        logger.lifecycle("Sound asset verification passed: ${definitions.size()} definitions, ${actualAssets.size()} OGG assets, ${referencedAssets.size()} unique custom references.")
+    }
+}
+
 var modJar = tasks.named("jar", Jar).flatMap { it.archiveFile }
 var requiredJarResources = [
         "assets/ohyeah/sounds.json",
@@ -249,6 +356,7 @@ var verifyJarResources = tasks.register("verifyJarResources") {
 
 tasks.named("check") {
     dependsOn verifyJarResources
+    dependsOn verifySoundAssets
 }
 
 var configuredModVersion = mod_version.toString()

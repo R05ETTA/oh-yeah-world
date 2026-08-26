@@ -17,10 +17,6 @@ Oh Yeah! World（欧耶世界）是一个适用于 Minecraft 1.21.1 / NeoForge 2
    - NeoForge `21.1.248`
    - Java `21`
 
-### 开发测试版本
-
-维护者也可以从 GitHub **Actions → Build → Artifacts** 下载 `ohyeah-mod`。该文件用于开发测试，不代表正式发布版本。
-
 ## 生物玩法
 
 ### 围巾罗（天素罗亚种）
@@ -75,13 +71,6 @@ Oh Yeah! World（欧耶世界）是一个适用于 Minecraft 1.21.1 / NeoForge 2
 /summon ohyeah:suxia ~ ~ ~ {PersistenceRequired:1b}
 ```
 
-开发者调试用实体和方块 ID（仅命令或脚本使用）：
-
-```text
-ohyeah:tiansuluo_pink_scarf_luanluan_block
-ohyeah:tiansuluo_battle_face_luanluan_block
-```
-
 ## 栾栾用途
 
 - 围巾罗栾栾或战斗脸栾栾都可以制作虾米糊糊：熔炉 200 tick、烟熏炉 100 tick、营火 600 tick。
@@ -109,6 +98,8 @@ Oh Yeah! World 只管理围巾罗、战斗脸和素虾的自定义物种声音�
 
 剪刀工具音、栾栾块放置音、方块音、脚步声和世界环境音仍由 Minecraft 原生系统处理。
 
+素虾从头部发射栾栾时使用投射物发射音效。
+
 ## 常见问题
 
 ### Mod 没有加载
@@ -123,33 +114,3 @@ Oh Yeah! World 只管理围巾罗、战斗脸和素虾的自定义物种声音�
 ### 找不到生物
 
 第一次体验建议使用上面的 `/summon` 命令，不要先等待自然生成。自然生成会受到群系、水体和随机生成条件影响。
-
-### GitHub Actions 没有 JAR
-
-只有成功完成的 **Build** 工作流才会上传 `ohyeah-mod` Artifact。若工作流失败，请先查看构建日志，再使用成功的工作流运行记录下载 JAR。
-
-## 开发与自动化
-
-项目将构建、资源校验和 GameTest 集中在 Gradle 任务中：
-
-```text
-./gradlew compileJava        # 快速编译
-./gradlew runClient          # 启动开发客户端
-./gradlew runData            # 手动重新生成数据资源
-./gradlew build              # 自动生成资源、打包并检查 JAR
-./gradlew ciCheck            # build + 全部 GameTest
-./gradlew releaseCheck       # 发布版本和标签检查 + ciCheck
-```
-
-GitHub 的 Build 工作流调用 `ciCheck`；Release 工作流调用 `releaseCheck`，确保本地与 CI 使用同一套验证规则。
-
-## 项目状态
-
-当前版本已经完成客户端人工回归，核心的喂食、声音、主人协同攻击、误伤反击和战斗脸扑击没有发现明显异常。
-
-后续版本仍可能继续调整生物行为、资源和数值。使用问题请记录：
-
-- Minecraft、NeoForge 和 Java 版本
-- Mod JAR 来源对应的 GitHub Actions 工作流
-- 复现步骤
-- 游戏日志或截图
