@@ -46,8 +46,7 @@ public final class ModSoundDefinitionsProvider extends SoundDefinitionsProvider 
         }
         add(ModSoundEvents.TIANSULUO_PS_HURT, definition().subtitle("subtitles.ohyeah.tiansuluo_ps.hurt").with(
                 sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_01"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_02"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_03"),
-                sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_04"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_05"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_06"),
-                sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_07"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_08"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_09"),
+                sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_05"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_08"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_09"),
                 sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_10"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_11"), sound("ohyeah:entity/tiansuluo_pink_scarf/hurt_12")));
         add(ModSoundEvents.TIANSULUO_PS_DEATH, definition().subtitle("subtitles.ohyeah.tiansuluo_ps.death").with(sound("ohyeah:entity/tiansuluo_pink_scarf/death_01")));
         // Placeholder voice; replace luanluan_block_broken_01.ogg after the spoken line is recorded.

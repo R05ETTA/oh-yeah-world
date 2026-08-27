@@ -79,9 +79,10 @@ public final class PinkScarfProfile {
     );
     public static final TiansuluoFoods FOODS = new TiansuluoFoods(FOOD_LIKED, FOOD_FAVORITE);
 
-    /** 原生 RangedAttackGoal 的发射节奏；每次 performRangedAttack 发射一枚。 */
+    /** 语音阶段结束后，原生 RangedAttackGoal 可继续使用该目标的时间。 */
     public static final int RETALIATION_MEMORY_TICKS = 1200;
-    public static final int ATTACK_DECLARE_TICKS = 40;
+    /** 复用的攻击宣告音约 3.90 秒，按 80 tick 计入服务端状态机。 */
+    public static final int ATTACK_DECLARE_TICKS = 80;
     public static final int BURST_SHOTS = 6;
     /** 骑乘时由玩家攻击触发的短连射数量。 */
     public static final int RIDER_BURST_SHOTS = 3;

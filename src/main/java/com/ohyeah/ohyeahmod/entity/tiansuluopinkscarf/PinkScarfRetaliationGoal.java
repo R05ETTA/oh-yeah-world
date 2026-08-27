@@ -6,8 +6,8 @@ import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 /**
  * 基于原生 RangedAttackGoal 的受击反击目标。
  *
- * <p>目标选择、移动、视线判断和发射节奏交给原生 Goal；粉围巾实体只提供
- * performRangedAttack 的投射物实现和一个有限的受击记忆窗口。</p>
+ * <p>目标选择、移动、视线判断和发射节奏交给原生 Goal；粉围巾实体负责服务端的受击语音、
+ * 攻击宣言状态机，以及一个有限的受击记忆窗口。</p>
  */
 public final class PinkScarfRetaliationGoal extends RangedAttackGoal {
     private final TiansuluoPinkScarfEntity pinkScarf;
@@ -39,6 +39,12 @@ public final class PinkScarfRetaliationGoal extends RangedAttackGoal {
                 && this.pinkScarf.distanceToSqr(target)
                 <= (double) PinkScarfProfile.RETALIATION_RANGE * PinkScarfProfile.RETALIATION_RANGE
                 && super.canContinueToUse();
+    }
+
+    @Override
+    public boolean isInterruptable() {
+        // Once retaliation has started, ordinary Goals cannot break the attack sequence.
+        return !this.pinkScarf.isRetaliating();
     }
 
     @Override

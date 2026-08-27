@@ -27,7 +27,7 @@ public final class PinkScarfOwnerHurtTargetGoal extends OwnerHurtTargetGoal {
         super.start();
         LivingEntity target = this.pinkScarf.getTarget();
         if (target != null) {
-            this.pinkScarf.beginRetaliation(target);
+            this.pinkScarf.beginOwnerRetaliation(target);
             if (this.pinkScarf.getOwner() instanceof ServerPlayer owner) {
                 ModAdvancementTracker.award(owner, ModAdvancementIds.OWNER_COMBAT);
             }

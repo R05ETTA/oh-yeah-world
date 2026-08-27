@@ -40,7 +40,7 @@ public final class PinkScarfClientFeedback {
             case PinkScarfProfile.EVENT_EAT_FAVORITE -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_EAT_FAVORITE.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_EAT_FAVORITE, true);
             case PinkScarfProfile.EVENT_ATTACK_SHOT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_SHOT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_SHOT, false);
             case PinkScarfProfile.EVENT_ATTACK_END -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_ATTACK_END.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_END, false);
-            case PinkScarfProfile.EVENT_HURT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_HURT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_HURT, false);
+            case PinkScarfProfile.EVENT_HURT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_PS_HURT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_HURT, false, true);
             case PinkScarfProfile.EVENT_DEATH -> ClientSoundManager.playDetachedAction(
                     entity,
                     ModSoundEvents.TIANSULUO_PS_DEATH.get(),

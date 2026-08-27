@@ -11,6 +11,7 @@ import com.ohyeah.ohyeahmod.registry.ModItems;
 import com.ohyeah.ohyeahmod.entity.suxia.SuxiaEntity;
 import com.ohyeah.ohyeahmod.entity.suxia.SuxiaProfile;
 import com.ohyeah.ohyeahmod.entity.suxia.SuxiaLuanluanProjectileEntity;
+import com.ohyeah.ohyeahmod.entity.tiansuluo.RetaliationAnger;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfLayEggGoal;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProfile;
 import com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf.PinkScarfProjectileEntity;
@@ -402,5 +403,67 @@ public final class ModGameTests {
                     helper.assertTrue(battleFace.isInSittingPose(), "Battle Face should sit again after combat");
                 })
                 .thenSucceed();
+    }
+    @GameTest(template = TEMPLATE, batch = "ohyeah_voice_chain", timeoutTicks = 40)
+    public static void battleFaceAccumulatesAngerBeforeRetaliation(GameTestHelper helper) {
+        TiansuluoBattleFaceEntity battleFace = helper.spawn(
+                ModEntityTypes.TIANSULUO_BATTLE_FACE.get(),
+                new BlockPos(2, 1, 2)
+        );
+        var attacker = helper.spawn(EntityType.COW, new BlockPos(4, 1, 2));
+
+        helper.runAtTickTime(1, () -> {
+            helper.assertTrue(
+                    battleFace.hurt(battleFace.damageSources().mobAttack(attacker), 1.0F),
+                    "The Battle Face should accept the test hit"
+            );
+            helper.assertTrue(
+                    battleFace.state().retaliationAnger().anger() > 0,
+                    "An accepted hit should increase retaliation anger"
+            );
+            helper.assertTrue(
+                    battleFace.getTarget() == null,
+                    "A low-anger hit should not immediately start retaliation"
+            );
+            helper.assertFalse(
+                    battleFace.state().isRetaliationDeclareStarted(),
+                    "The attack declaration must wait for the anger trigger"
+            );
+            helper.succeed();
+        });
+    }
+    @GameTest(template = TEMPLATE, batch = "ohyeah_voice_chain", timeoutTicks = 40)
+    public static void battleFaceGuaranteesRetaliationAfterRepeatedHits(GameTestHelper helper) {
+        TiansuluoBattleFaceEntity battleFace = helper.spawn(
+                ModEntityTypes.TIANSULUO_BATTLE_FACE.get(),
+                new BlockPos(2, 1, 2)
+        );
+        var attacker = helper.spawn(EntityType.COW, new BlockPos(4, 1, 2));
+        long gameTime = helper.getLevel().getGameTime();
+        for (int hit = 0; hit < RetaliationAnger.GUARANTEE_HITS - 1; hit++) {
+            battleFace.state().retaliationAnger().recordHit(1.0F, battleFace.getMaxHealth(), gameTime);
+        }
+
+        helper.runAtTickTime(1, () -> {
+            helper.assertTrue(
+                    battleFace.hurt(battleFace.damageSources().mobAttack(attacker), 1.0F),
+                    "The Battle Face should accept the guaranteed trigger hit"
+            );
+            helper.assertTrue(battleFace.getTarget() == attacker, "The guaranteed trigger should select the hitter");
+            helper.assertTrue(
+                    battleFace.state().isRetaliationDeclareStarted(),
+                    "The anger guarantee should start the declaration immediately"
+            );
+            helper.assertTrue(
+                    battleFace.state().getRetaliationDeclareTicksRemaining() > 0,
+                    "The guaranteed trigger should reserve the declaration window"
+            );
+            helper.assertValueEqual(
+                    battleFace.state().retaliationAnger().anger(),
+                    0,
+                    "Triggering retaliation should reset anger"
+            );
+            helper.succeed();
+        });
     }
 }

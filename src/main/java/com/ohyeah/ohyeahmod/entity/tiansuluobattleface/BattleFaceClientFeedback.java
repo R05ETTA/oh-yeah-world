@@ -31,7 +31,7 @@ public final class BattleFaceClientFeedback {
             case BattleFaceProfile.EVENT_EAT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_EAT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_EAT, true);
             case BattleFaceProfile.EVENT_EAT_FAVORITE -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_EAT_FAVORITE.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_EAT_FAVORITE, true);
             case BattleFaceProfile.EVENT_ATTACK_END -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_ATTACK_END.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_ATTACK_END, false);
-            case BattleFaceProfile.EVENT_HURT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_HURT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_HURT, false);
+            case BattleFaceProfile.EVENT_HURT -> ClientSoundManager.playAction(entity, ModSoundEvents.TIANSULUO_HURT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_HURT, false, true);
             case BattleFaceProfile.EVENT_DEATH -> ClientSoundManager.playDetachedAction(
                     entity,
                     ModSoundEvents.TIANSULUO_DEATH.get(),

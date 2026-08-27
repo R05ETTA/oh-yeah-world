@@ -58,9 +58,9 @@ public final class BattleFaceProfile {
 
     /** 飞扑冷却时间。 */
     public static final int POUNCE_COOLDOWN = 40;
-    /** 反击宣告时长。 */
-    public static final int RETALIATION_DECLARE_TICKS = 40;
-    /** 反击总时长。 */
+    /** 反击宣告语音约 3.90 秒，按 80 tick 计入服务端状态机。 */
+    public static final int RETALIATION_DECLARE_TICKS = 80;
+    /** 宣言结束后的实际反击窗口。 */
     public static final int RETALIATION_TOTAL_TICKS = 100;
     /** 野生战颜每轮扑击后保留仇恨的时间；驯化战颜不使用连续模式。 */
     public static final int RETALIATION_MEMORY_TICKS = 1200;

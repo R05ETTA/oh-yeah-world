@@ -1,5 +1,6 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluobattleface;
 
+import com.ohyeah.ohyeahmod.entity.tiansuluo.RetaliationAnger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * 战颜真正需要跨 tick、客户端同步或存档保存的状态。
  *
- * <p>反击计时只属于短期服务端运行时，不写入 NBT；携蛋、禁声和幼体成长检测
+ * <p>怒气和反击计时只属于短期服务端运行时，不写入 NBT；携蛋、禁声和幼体成长检测
  * 才是实体生命周期的一部分。</p>
  */
 public final class BattleFaceState {
@@ -26,8 +27,10 @@ public final class BattleFaceState {
     private boolean noticedPlayer;
     private int carriedEggCount = BattleFaceProfile.LUANLUAN_MIN_COUNT;
     private int pounceCooldownTicks;
+    private final RetaliationAnger retaliationAnger = new RetaliationAnger();
     private int retaliationDeclareTicksRemaining;
     private int retaliationTicksRemaining;
+    private boolean retaliationDeclareStarted;
     private boolean wasBabyLastTick;
 
     public static void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -117,6 +120,19 @@ public final class BattleFaceState {
 
     public void decrementPounceCooldown() {
         if (this.pounceCooldownTicks > 0) this.pounceCooldownTicks--;
+    }
+
+    public RetaliationAnger retaliationAnger() {
+        return this.retaliationAnger;
+    }
+
+
+    public boolean isRetaliationDeclareStarted() {
+        return this.retaliationDeclareStarted;
+    }
+
+    public void setRetaliationDeclareStarted(boolean started) {
+        this.retaliationDeclareStarted = started;
     }
 
     public int getRetaliationDeclareTicksRemaining() {

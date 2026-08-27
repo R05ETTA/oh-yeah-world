@@ -14,7 +14,9 @@ public final class PinkScarfHurtByTargetGoal extends HurtByTargetGoal {
 
     @Override
     public boolean canUse() {
-        if (this.pinkScarf.isRiddenByOwner() || !super.canUse()) {
+        if (this.pinkScarf.isRiddenByOwner()
+                || this.pinkScarf.isRetaliating()
+                || !super.canUse()) {
             return false;
         }
         LivingEntity attacker = this.pinkScarf.getLastHurtByMob();

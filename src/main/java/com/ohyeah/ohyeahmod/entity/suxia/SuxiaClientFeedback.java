@@ -12,13 +12,7 @@ public final class SuxiaClientFeedback {
 
     public void handleClientEntityEvent(SuxiaEntity entity, byte status) {
         switch (status) {
-            case SuxiaProfile.EVENT_HURT -> ClientSoundManager.playAction(
-                    entity,
-                    ModSoundEvents.SUXIA_HURT.get(),
-                    SoundSource.NEUTRAL,
-                    ClientSoundManager.PRIORITY_HURT,
-                    false
-            );
+            case SuxiaProfile.EVENT_HURT -> ClientSoundManager.playAction(entity, ModSoundEvents.SUXIA_HURT.get(), SoundSource.NEUTRAL, ClientSoundManager.PRIORITY_HURT, false, true);
             case SuxiaProfile.EVENT_DEATH -> ClientSoundManager.playDetachedAction(
                     entity,
                     ModSoundEvents.SUXIA_DEATH.get(),

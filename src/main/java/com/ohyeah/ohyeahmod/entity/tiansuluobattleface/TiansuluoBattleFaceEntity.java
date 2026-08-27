@@ -35,8 +35,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * 战颜实体。
  *
- * <p>战斗规则只有一条：被有效攻击或响应主人直接攻击的目标后，在短暂宣言后靠近并扑击；不主动
- * 追击，也不会自行寻找未被主人或自身攻击的目标。</p>
+ * <p>战斗规则只有一条：受击积累怒气并在触发后宣言，再靠近目标并扑击；不主动追击，也不会自行寻找未被主人或自身攻击的目标。</p>
  */
 public class TiansuluoBattleFaceEntity extends TamableAnimal {
     public static final EntityDataAccessor<Boolean> HAS_CARRIED_EGG_BLOCK =
@@ -120,7 +119,7 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
         }
         ModAdvancementTracker.checkEncounter(this, ModAdvancementIds.MEET_BATTLE_FACE, "battle_face");
         this.tickPlayerNotice();
-
+        this.state.retaliationAnger().tick(this.level().getGameTime(), this.getMaxHealth());
         if (this.state.wasBabyLastTick() && !this.isBaby()) {
             this.level().broadcastEntityEvent(this, BattleFaceProfile.EVENT_GROW_UP);
         }
@@ -134,9 +133,11 @@ public class TiansuluoBattleFaceEntity extends TamableAnimal {
     public boolean hurt(DamageSource source, float amount) {
         boolean hurt = super.hurt(source, amount);
         if (hurt && !this.level().isClientSide && this.isAlive()) {
-            this.level().broadcastEntityEvent(this, BattleFaceProfile.EVENT_HURT);
+            if (this.state.getRetaliationTicksRemaining() <= 0 || this.getTarget() == null) {
+                this.level().broadcastEntityEvent(this, BattleFaceProfile.EVENT_HURT);
+            }
         }
-        this.retaliation.onHurt(this, hurt, source);
+        this.retaliation.onHurt(this, hurt, source, amount);
         return hurt;
     }
 

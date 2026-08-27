@@ -1,5 +1,6 @@
 package com.ohyeah.ohyeahmod.entity.tiansuluopinkscarf;
 
+import com.ohyeah.ohyeahmod.entity.tiansuluo.RetaliationAnger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * 粉围巾真正需要跨客户端/存档保存的状态。
  *
- * <p>攻击计时属于原生 RangedAttackGoal 的短期运行时状态，不写入这里；携蛋和剪后禁声
+ * <p>怒气和攻击计时属于短期服务端运行时，不写入这里；携蛋和剪后禁声
  * 才是会影响玩家后续操作、必须保存的状态。</p>
  */
 public final class PinkScarfState {
@@ -25,6 +26,7 @@ public final class PinkScarfState {
     private int eggBlockPlacingCounter;
     private boolean noticedPlayer;
     private int carriedEggCount = PinkScarfProfile.LUANLUAN_MIN_COUNT;
+    private final RetaliationAnger retaliationAnger = new RetaliationAnger();
 
     public static void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(TiansuluoPinkScarfEntity.HAS_CARRIED_EGG_BLOCK, false);
@@ -61,6 +63,10 @@ public final class PinkScarfState {
                 ? this.clampEggCount(nbt.getInt(TAG_CARRIED_EGG_COUNT))
                 : PinkScarfProfile.LUANLUAN_MIN_COUNT;
     }
+    public RetaliationAnger retaliationAnger() {
+        return this.retaliationAnger;
+    }
+
     public void setSilenced(TiansuluoPinkScarfEntity entity, boolean silenced) {
         entity.getEntityData().set(TiansuluoPinkScarfEntity.IS_SILENCED, silenced);
     }

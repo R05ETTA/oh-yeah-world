@@ -61,9 +61,10 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
 
     private final PinkScarfState state = new PinkScarfState();
 
-    /* 反击计时只描述 RangedAttackGoal 的有效窗口，不负责替代 Goal 调度。 */
+    /* 反击状态机的服务端计时；宣言完成后才交给 RangedAttackGoal 发射。 */
     private int retaliationTicksRemaining;
     private int retaliationDeclareTicksRemaining;
+    private boolean retaliationDeclareStarted;
     private int retaliationBurstShotsFired;
     private int retaliationBurstCooldownTicks;
     private boolean wasBabyLastTick;
@@ -126,7 +127,7 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         }
         ModAdvancementTracker.checkEncounter(this, ModAdvancementIds.MEET_SCARF_LUO, "scarf_luo");
         this.tickPlayerNotice();
-
+        this.state.retaliationAnger().tick(this.level().getGameTime(), this.getMaxHealth());
         this.tickRetaliationWindow();
         this.tickRiderBurst();
         if (this.wasBabyLastTick && !this.isBaby()) {
@@ -139,12 +140,23 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
     public boolean hurt(DamageSource source, float amount) {
         boolean hurt = super.hurt(source, amount);
         if (hurt && !this.level().isClientSide && this.isAlive()) {
-            this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_HURT);
-        }
-        if (hurt && !this.level().isClientSide && !this.isRiddenByOwner()
-                && source.getEntity() instanceof LivingEntity attacker) {
-            if (this.canRetaliateAgainst(attacker)) {
-                this.beginRetaliation(attacker);
+            this.state.retaliationAnger().recordHit(
+                    amount,
+                    this.getMaxHealth(),
+                    this.level().getGameTime()
+            );
+            if (!this.isRetaliating()) {
+                this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_HURT);
+            }
+            if (!this.isRiddenByOwner()
+                    && !this.isRetaliating()
+                    && source.getEntity() instanceof LivingEntity attacker
+                    && this.canRetaliateAgainst(attacker)
+                    && this.state.retaliationAnger().shouldTrigger(
+                            this.getHealth(),
+                            this.getMaxHealth(),
+                            this.getRandom())) {
+                this.beginHurtRetaliation(attacker);
             }
         }
         return hurt;
@@ -599,30 +611,42 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         return true;
     }
 
-    void beginRetaliation(LivingEntity attacker) {
-        this.setTarget(attacker);
+    void beginOwnerRetaliation(LivingEntity target) {
+        this.beginRetaliation(target);
+    }
+
+    void beginHurtRetaliation(LivingEntity attacker) {
+        this.beginRetaliation(attacker);
+    }
+
+    private void beginRetaliation(LivingEntity target) {
+        this.setTarget(target);
+        this.state.retaliationAnger().reset();
         this.retaliationTicksRemaining = PinkScarfProfile.RETALIATION_MEMORY_TICKS;
-        this.retaliationDeclareTicksRemaining = PinkScarfProfile.ATTACK_DECLARE_TICKS;
+        this.retaliationDeclareTicksRemaining = 0;
+        this.retaliationDeclareStarted = false;
         this.retaliationBurstShotsFired = 0;
         this.retaliationBurstCooldownTicks = 0;
+        this.beginRetaliationDeclaration();
+    }
+
+    private void beginRetaliationDeclaration() {
+        if (this.retaliationDeclareStarted) {
+            return;
+        }
+
+        this.retaliationDeclareStarted = true;
+        if (this.isSilent() || this.state.isSilenced(this)) {
+            this.retaliationDeclareTicksRemaining = 0;
+            return;
+        }
+
+        this.retaliationDeclareTicksRemaining = PinkScarfProfile.ATTACK_DECLARE_TICKS;
         this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_ATTACK_DECLARE);
     }
 
     void tickRetaliationWindow() {
         if (this.retaliationTicksRemaining <= 0) {
-            this.finishRetaliation();
-            return;
-        }
-
-        this.retaliationTicksRemaining--;
-        if (this.retaliationDeclareTicksRemaining > 0) {
-            this.retaliationDeclareTicksRemaining--;
-        }
-        if (this.retaliationBurstCooldownTicks > 0) {
-            this.retaliationBurstCooldownTicks--;
-        }
-        if (this.retaliationBurstShotsFired >= PinkScarfProfile.BURST_SHOTS
-                && this.retaliationBurstCooldownTicks <= 0) {
             this.finishRetaliation();
             return;
         }
@@ -635,14 +659,40 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
         }
 
         this.getLookControl().setLookAt(target, 30.0F, 30.0F);
+
+
+        if (!this.retaliationDeclareStarted) {
+            this.beginRetaliationDeclaration();
+            return;
+        }
+
+        if (this.retaliationDeclareTicksRemaining > 0) {
+            this.retaliationDeclareTicksRemaining--;
+            return;
+        }
+
+        if (this.retaliationBurstCooldownTicks > 0) {
+            this.retaliationBurstCooldownTicks--;
+        }
+        if (this.retaliationBurstShotsFired >= PinkScarfProfile.BURST_SHOTS
+                && this.retaliationBurstCooldownTicks <= 0) {
+            this.finishRetaliation();
+            return;
+        }
+
+        this.retaliationTicksRemaining--;
+        if (this.retaliationTicksRemaining <= 0) {
+            this.finishRetaliation();
+        }
     }
 
     boolean isRetaliating() {
         return this.retaliationTicksRemaining > 0 && this.getTarget() != null;
     }
 
+
     boolean isRetaliationDeclaring() {
-        return this.retaliationDeclareTicksRemaining > 0;
+        return this.retaliationDeclareStarted && this.retaliationDeclareTicksRemaining > 0;
     }
 
     boolean canFireRetaliationAt(LivingEntity target) {
@@ -653,13 +703,21 @@ public class TiansuluoPinkScarfEntity extends TamableAnimal implements RangedAtt
     }
 
     void finishRetaliation() {
-        boolean wasActive = this.retaliationTicksRemaining > 0;
+        boolean wasActive = this.retaliationTicksRemaining > 0
+                || this.retaliationDeclareStarted
+                || this.getTarget() != null;
+        boolean shouldPlayEnd = this.retaliationDeclareStarted
+                && (this.retaliationDeclareTicksRemaining > 0 || this.retaliationBurstShotsFired > 0);
         this.retaliationTicksRemaining = 0;
+        if (wasActive) {
+            this.state.retaliationAnger().reset();
+        }
         this.retaliationDeclareTicksRemaining = 0;
+        this.retaliationDeclareStarted = false;
         this.retaliationBurstShotsFired = 0;
         this.retaliationBurstCooldownTicks = 0;
         this.setTarget(null);
-        if (wasActive && !this.level().isClientSide) {
+        if (shouldPlayEnd && !this.level().isClientSide) {
             this.level().broadcastEntityEvent(this, PinkScarfProfile.EVENT_ATTACK_END);
         }
     }

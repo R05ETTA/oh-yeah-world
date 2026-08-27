@@ -9,7 +9,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.EnumSet;
 
 /**
- * 战颜唯一的主动攻击动作：宣言结束后靠近目标，进入近身窗口再扑击。
+ * 战颜唯一的主动攻击动作：怒气触发宣言结束后靠近目标，进入近身窗口再扑击。
  */
 public final class BattleFacePounceAttack extends Goal {
     private final TiansuluoBattleFaceEntity entity;
@@ -43,6 +43,13 @@ public final class BattleFacePounceAttack extends Goal {
     }
 
     @Override
+    public boolean isInterruptable() {
+        // Once retaliation has started, ordinary Goals cannot break the attack sequence.
+        return this.entity.state().getRetaliationTicksRemaining() <= 0
+                || this.entity.getTarget() == null;
+    }
+
+    @Override
     public void start() {
         this.committedTarget = this.entity.getTarget();
         this.flightTicksRemaining = BattleFaceProfile.POUNCE_MAX_FLIGHT_TICKS;
@@ -55,7 +62,8 @@ public final class BattleFacePounceAttack extends Goal {
         this.entity.getNavigation().stop();
         if (this.committedTarget != null
                 && !this.resolved
-                && (this.entity.state().getRetaliationTicksRemaining() > 0 || this.entity.getTarget() != null)) {
+                && this.entity.getTarget() == this.committedTarget
+                && !this.isDeclarationPhase()) {
             this.finishAttempt();
         }
         this.committedTarget = null;
@@ -66,18 +74,30 @@ public final class BattleFacePounceAttack extends Goal {
     @Override
     public void tick() {
         LivingEntity target = this.entity.getTarget();
-        if (target == null || target != this.committedTarget || !target.isAlive()) {
+        if (target == null || !target.isAlive()) {
             this.finishAttempt();
+            return;
+        }
+        if (target != this.committedTarget) {
+            // A newer hit may have replaced the target; leave the new retaliation state intact.
+            this.entity.getNavigation().stop();
+            this.entity.setDeltaMovement(Vec3.ZERO);
+            this.launched = false;
+            this.flightTicksRemaining = BattleFaceProfile.POUNCE_MAX_FLIGHT_TICKS;
             return;
         }
 
         this.entity.getLookControl().setLookAt(target, 22.0F, 22.0F);
 
+        if (this.isDeclarationPhase()) {
+            this.entity.getNavigation().stop();
+            this.entity.setDeltaMovement(Vec3.ZERO);
+            this.launched = false;
+            this.flightTicksRemaining = BattleFaceProfile.POUNCE_MAX_FLIGHT_TICKS;
+            return;
+        }
+
         if (!this.launched) {
-            if (this.entity.state().getRetaliationDeclareTicksRemaining() > 0) {
-                this.entity.getNavigation().stop();
-                return;
-            }
             if (!this.isWithinPounceWindow(target)) {
                 this.entity.getNavigation().moveTo(target, 1.2D);
                 return;
@@ -147,6 +167,7 @@ public final class BattleFacePounceAttack extends Goal {
     private void finishAttempt() {
         if (this.resolved) return;
         this.resolved = true;
+        boolean shouldPlayEnd = this.entity.state().isRetaliationDeclareStarted();
         // 野生战颜保留有效仇恨并在冷却后继续扑击；驯化战颜只完成这一轮。
         boolean continueRetaliation = !this.entity.isTame()
                 && this.entity.getTarget() != null
@@ -158,9 +179,15 @@ public final class BattleFacePounceAttack extends Goal {
         if (!continueRetaliation) {
             this.entity.setTarget(null);
         }
-        this.entity.level().broadcastEntityEvent(this.entity, BattleFaceProfile.EVENT_ATTACK_END);
+        if (shouldPlayEnd) {
+            this.entity.level().broadcastEntityEvent(this.entity, BattleFaceProfile.EVENT_ATTACK_END);
+        }
     }
 
+
+    private boolean isDeclarationPhase() {
+        return this.entity.state().getRetaliationDeclareTicksRemaining() > 0;
+    }
 
     private boolean isWithinPounceWindow(LivingEntity target) {
         return this.entity.distanceToSqr(target) <= BattleFaceProfile.POUNCE_WINDOW_SQUARED;

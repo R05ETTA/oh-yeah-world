@@ -17,24 +17,22 @@ import net.neoforged.api.distmarker.OnlyIn;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 /**
  * Oh Yeah 自定义物种声音管理器。
  *
- * <p>环境音使用每实体随机时钟、局部发言权、时长权重和短期记忆；动作音仍使用
- * 单实体主槽位和优先级抢占。只有严格更高优先级的声音可以打断当前声音。</p>
+ * <p>环境音使用每实体随机时钟、局部发言权、时长权重和短期记忆；所有自定义实体声音共享
+ * 一个主声音槽位，并按统一优先级比较。新声音只在优先级更高时抢占，同级声音默认不重启，
+ * 受击可以显式请求相同声音的同级重启。</p>
  */
 @OnlyIn(Dist.CLIENT)
 public final class ClientSoundManager {
     private static final Map<Integer, ActiveSound> ACTIVE_SOUNDS = new HashMap<>();
-    private static final Map<Integer, Set<SoundInstance>> OVERLAY_SOUNDS = new HashMap<>();
     private static final Map<Integer, VoiceState> VOICE_STATES = new HashMap<>();
     private static final Map<ResourceLocation, AmbientCatalog> SINGLE_AMBIENT_CATALOGS = new HashMap<>();
 
@@ -48,23 +46,25 @@ public final class ClientSoundManager {
     private static final int AMBIENT_REST_MAX = 900;
     private static final int ACTION_REST_MIN = 160;
     private static final int ACTION_REST_MAX = 400;
-    private static final int HURT_COOLDOWN_TICKS = 60;
     private static final int LOCAL_RECENT_MEMORY_TICKS = 1200;
     private static final int RECENT_AMBIENT_COUNT = 3;
 
-    /** 声音优先级按交互重要性分层。 */
+    /** 所有自定义声音共用同一套优先级；同级声音默认不会互相打断。 */
     public static final int PRIORITY_AMBIENT = 10;
-    public static final int PRIORITY_HURT = 25;
-    public static final int PRIORITY_ATTACK_DECLARE = 35;
-    public static final int PRIORITY_NOTICE_PLAYER = 45;
     public static final int PRIORITY_GROW_UP = 40;
+    public static final int PRIORITY_NOTICE_PLAYER = 45;
     public static final int PRIORITY_EAT = 60;
     public static final int PRIORITY_EAT_FAVORITE = 65;
     public static final int PRIORITY_ATTACK_SHOT = 70;
     public static final int PRIORITY_BREED_SUCCESS = 70;
-    public static final int PRIORITY_ATTACK_END = 80;
-    public static final int PRIORITY_SHEAR = 90;
+    /** 受击高于普通动作，但低于宣言和剪毛反应。 */
+    public static final int PRIORITY_HURT = 95;
+    public static final int PRIORITY_ATTACK_DECLARE = 96;
+    public static final int PRIORITY_SHEAR = 97;
+    /** 阶段结束事件需要能够收尾宣言或发射音，但不能覆盖死亡音。 */
+    public static final int PRIORITY_ATTACK_END = 98;
     public static final int PRIORITY_DEATH = 100;
+
 
     /** 每一帧清理播放完毕的声音，并从实际结束时间开始安排下一次环境音。 */
     public static void update() {
@@ -90,14 +90,6 @@ public final class ClientSoundManager {
             }
         }
 
-        Iterator<Map.Entry<Integer, Set<SoundInstance>>> overlayEntities = OVERLAY_SOUNDS.entrySet().iterator();
-        while (overlayEntities.hasNext()) {
-            Set<SoundInstance> overlays = overlayEntities.next().getValue();
-            overlays.removeIf(instance -> !mc.getSoundManager().isActive(instance));
-            if (overlays.isEmpty()) {
-                overlayEntities.remove();
-            }
-        }
 
         VOICE_STATES.entrySet().removeIf(entry ->
                 !ACTIVE_SOUNDS.containsKey(entry.getKey()) && mc.level.getEntity(entry.getKey()) == null);
@@ -141,7 +133,10 @@ public final class ClientSoundManager {
 
         ActiveSound current = ACTIVE_SOUNDS.get(entity.getId());
         if (current != null) {
-            return;
+            if (mc.getSoundManager().isActive(current.instance())) {
+                return;
+            }
+            ACTIVE_SOUNDS.remove(entity.getId());
         }
 
         if (hasNearbyActiveAmbient(entity, mc)) {
@@ -169,21 +164,21 @@ public final class ClientSoundManager {
                 PRIORITY_AMBIENT,
                 SoundKind.AMBIENT,
                 catalog.id(),
-                selected.repeatKey()
+                selected.repeatKey(),
+                selected.sound().getLocation()
         ));
         state.rememberAmbient(catalog.id(), selected.repeatKey(), gameTime);
         state.nextAmbientTick = Long.MAX_VALUE;
         mc.getSoundManager().play(instance);
     }
 
-    /** 播放普通物种动作音。 */
+
+    /** 播放占用实体唯一主声音槽的动作音，沿用统一优先级抢占规则。 */
     public static void playAction(LivingEntity entity, SoundEvent sound, SoundSource source) {
         playAction(entity, sound, source, 0, false);
     }
 
-    /**
-     * 播放物种动作音。低或同优先级声音不会打断当前声音；受伤语音额外有 3 秒防抖。
-     */
+    /** 同级动作音默认不会重启；需要重启时使用带 restartIfSameSound 的重载。 */
     public static void playAction(
             LivingEntity entity,
             SoundEvent sound,
@@ -191,28 +186,35 @@ public final class ClientSoundManager {
             int priority,
             boolean allowWhenSilenced
     ) {
-        if (sound == null || isSilenced(entity) && !allowWhenSilenced) {
+        playAction(entity, sound, source, priority, allowWhenSilenced, false);
+    }
+
+    /**
+     * 播放实体主声音。新声音只在优先级更高时抢占；同级时仅允许相同声音事件按请求重启。
+     */
+    public static void playAction(
+            LivingEntity entity,
+            SoundEvent sound,
+            SoundSource source,
+            int priority,
+            boolean allowWhenSilenced,
+            boolean restartIfSameSound
+    ) {
+        if (sound == null || (entity.isSilent() || isSilenced(entity)) && !allowWhenSilenced) {
             return;
         }
 
         Minecraft mc = Minecraft.getInstance();
-        long gameTime = mc.level == null ? 0L : mc.level.getGameTime();
-        VoiceState state = stateFor(entity, gameTime);
-        if (priority == PRIORITY_HURT && gameTime - state.lastHurtTick < HURT_COOLDOWN_TICKS) {
+        if (mc.level == null) {
             return;
         }
 
-        ActiveSound active = ACTIVE_SOUNDS.get(entity.getId());
-        if (active != null && mc.getSoundManager().isActive(active.instance())) {
-            if (active.priority() >= priority) {
-                return;
-            }
-            stopPrimarySound(entity, mc);
+        long gameTime = mc.level.getGameTime();
+        VoiceState state = stateFor(entity, gameTime);
+        if (!preparePrimarySound(entity, sound.getLocation(), priority, restartIfSameSound, mc)) {
+            return;
         }
 
-        if (priority == PRIORITY_HURT) {
-            state.lastHurtTick = gameTime;
-        }
         EntityBoundSoundInstance instance = new EntityBoundSoundInstance(
                 sound,
                 source,
@@ -221,13 +223,21 @@ public final class ClientSoundManager {
                 entity,
                 state.random.nextLong()
         );
-        ACTIVE_SOUNDS.put(entity.getId(), new ActiveSound(instance, priority, SoundKind.ACTION, null, null));
+        ACTIVE_SOUNDS.put(entity.getId(), new ActiveSound(
+                instance,
+                priority,
+                SoundKind.ACTION,
+                null,
+                null,
+                sound.getLocation()
+        ));
         state.nextAmbientTick = Long.MAX_VALUE;
         mc.getSoundManager().play(instance);
     }
 
     /**
-     * 播放不会随实体移除而中断的一次性声音，供死亡语音和栾栾块被破坏语音使用。
+     * 播放脱离实体绑定的一次性主声音；抢占判断仍与普通动作音完全一致。
+     * 供死亡语音和栾栾块被破坏语音使用。
      */
     public static void playDetachedAction(
             LivingEntity entity,
@@ -236,19 +246,19 @@ public final class ClientSoundManager {
             int priority,
             boolean allowWhenSilenced
     ) {
-        if (sound == null || isSilenced(entity) && !allowWhenSilenced) {
+        if (sound == null || (entity.isSilent() || isSilenced(entity)) && !allowWhenSilenced) {
             return;
         }
 
         Minecraft mc = Minecraft.getInstance();
-        long gameTime = mc.level == null ? 0L : mc.level.getGameTime();
+        if (mc.level == null) {
+            return;
+        }
+
+        long gameTime = mc.level.getGameTime();
         VoiceState state = stateFor(entity, gameTime);
-        ActiveSound active = ACTIVE_SOUNDS.get(entity.getId());
-        if (active != null && mc.getSoundManager().isActive(active.instance())) {
-            if (active.priority() >= priority) {
-                return;
-            }
-            stopPrimarySound(entity, mc);
+        if (!preparePrimarySound(entity, sound.getLocation(), priority, false, mc)) {
+            return;
         }
 
         SimpleSoundInstance instance = new SimpleSoundInstance(
@@ -261,37 +271,23 @@ public final class ClientSoundManager {
                 entity.getY(),
                 entity.getZ()
         );
-        ACTIVE_SOUNDS.put(entity.getId(), new ActiveSound(instance, priority, SoundKind.ACTION, null, null));
+        ACTIVE_SOUNDS.put(entity.getId(), new ActiveSound(
+                instance,
+                priority,
+                SoundKind.ACTION,
+                null,
+                null,
+                sound.getLocation()
+        ));
         state.nextAmbientTick = Long.MAX_VALUE;
         mc.getSoundManager().play(instance);
     }
 
-    /** 播放不占用实体主声音槽位的短特效音。 */
-    public static void playOverlay(LivingEntity entity, SoundEvent sound, SoundSource source) {
-        if (sound == null || isSilenced(entity)) {
-            return;
-        }
-        EntityBoundSoundInstance instance = new EntityBoundSoundInstance(
-                sound,
-                source,
-                1.0F,
-                1.0F,
-                entity,
-                entity.level().getRandom().nextLong()
-        );
-        OVERLAY_SOUNDS.computeIfAbsent(entity.getId(), ignored -> new HashSet<>()).add(instance);
-        Minecraft.getInstance().getSoundManager().play(instance);
-    }
+
 
     public static void stopSound(LivingEntity entity) {
         Minecraft mc = Minecraft.getInstance();
         stopPrimarySound(entity, mc);
-        Set<SoundInstance> overlays = OVERLAY_SOUNDS.remove(entity.getId());
-        if (overlays != null) {
-            for (SoundInstance overlay : overlays) {
-                mc.getSoundManager().stop(overlay);
-            }
-        }
     }
 
     /** 清理世界切换或客户端退出时残留的所有物种声音。 */
@@ -300,13 +296,7 @@ public final class ClientSoundManager {
         for (ActiveSound active : ACTIVE_SOUNDS.values()) {
             mc.getSoundManager().stop(active.instance());
         }
-        for (Set<SoundInstance> overlays : OVERLAY_SOUNDS.values()) {
-            for (SoundInstance overlay : overlays) {
-                mc.getSoundManager().stop(overlay);
-            }
-        }
         ACTIVE_SOUNDS.clear();
-        OVERLAY_SOUNDS.clear();
         VOICE_STATES.clear();
         SINGLE_AMBIENT_CATALOGS.clear();
     }
@@ -325,6 +315,35 @@ public final class ClientSoundManager {
                     : state.scaledDelay(ACTION_REST_MIN, ACTION_REST_MAX));
         }
     }
+    /** 应用统一主槽规则；返回 true 时调用方可以创建并播放新声音。 */
+    private static boolean preparePrimarySound(
+            LivingEntity entity,
+            ResourceLocation soundId,
+            int priority,
+            boolean restartIfSameSound,
+            Minecraft mc
+    ) {
+        ActiveSound active = ACTIVE_SOUNDS.get(entity.getId());
+        if (active != null && !mc.getSoundManager().isActive(active.instance())) {
+            ACTIVE_SOUNDS.remove(entity.getId());
+            active = null;
+        }
+        if (active == null) {
+            return true;
+        }
+
+        boolean higherPriority = priority > active.priority();
+        boolean restartSameSound = priority == active.priority()
+                && restartIfSameSound
+                && active.soundId().equals(soundId);
+        if (!higherPriority && !restartSameSound) {
+            return false;
+        }
+
+        stopPrimarySound(entity, mc);
+        return true;
+    }
+
 
     private static VoiceState stateFor(LivingEntity entity, long gameTime) {
         VoiceState state = VOICE_STATES.get(entity.getId());
@@ -469,9 +488,11 @@ public final class ClientSoundManager {
             int priority,
             SoundKind kind,
             String ambientCatalog,
-            String ambientKey
+            String ambientKey,
+            ResourceLocation soundId
     ) {
     }
+
 
     private static final class VoiceState {
         private final UUID entityUuid;
@@ -481,7 +502,6 @@ public final class ClientSoundManager {
         private final int checkOffset;
         private final Deque<String> recentAmbient = new ArrayDeque<>();
         private long nextAmbientTick;
-        private long lastHurtTick = Long.MIN_VALUE / 2L;
         private String lastAmbientCatalog;
         private String lastAmbientKey;
         private long lastAmbientTick = Long.MIN_VALUE;
